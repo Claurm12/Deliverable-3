@@ -123,4 +123,28 @@ public static class SerializerSolution
         }
         return sb.ToString();
     }
+
+    
+    public static byte[] SerializeTransform(int objectId, Vector3 pos)
+    {
+        MemoryStream stream = new MemoryStream();
+        BinaryWriter writer = new BinaryWriter(stream);
+
+        writer.Write(objectId);
+        writer.Write(pos.x);
+        writer.Write(pos.y);
+        writer.Write(pos.z);
+
+        return stream.ToArray();
+    }
+
+    public static void DeserializeTransform(byte[] data, out int objectId, out Vector3 pos)
+    {
+        BinaryReader reader = new BinaryReader(new MemoryStream(data));
+        objectId = reader.ReadInt32();
+        float x = reader.ReadSingle();
+        float y = reader.ReadSingle();
+        float z = reader.ReadSingle();
+        pos = new Vector3(x, y, z);
+    }
 }

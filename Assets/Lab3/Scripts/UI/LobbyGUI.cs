@@ -81,5 +81,6 @@ namespace Lab3Solution
             UnityEngine.SceneManagement.SceneManager.LoadScene(LobbySession.MenuScene);
             return true;
         }
+       
     }
 }

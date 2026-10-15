@@ -117,5 +117,13 @@ namespace Lab3Solution
         // There is no connection to close. Once it is out of the player list we ignore it, and since
         // nobody answers its PINGs any more, the client times out by itself if it missed our message.
         protected override void Drop(object connection) { }
+
+        public void BroadcastCustomBytes(byte[] payload)
+        {
+            foreach (Player p in Players)
+            {
+                Send(p.connection, payload);
+            }
+        }
     }
 }

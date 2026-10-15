@@ -41,4 +41,5 @@ public enum MsgType : byte
 {
     Text = 1,     // your lobby messages as they are now: JOIN:Anna, CHAT:hello...
     Player = 2,   // a PlayerDTO2
+    Transform = 3
 }

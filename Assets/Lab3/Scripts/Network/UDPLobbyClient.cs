@@ -108,5 +108,9 @@ namespace Lab3Solution
             if (m_thread != null) m_thread.Join(500);
             m_thread = null;
         }
+        public void SendCustomBytes(byte[] payload)
+        {
+            SendBytes(payload);
+        }
     }
 }

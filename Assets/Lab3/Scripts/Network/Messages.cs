@@ -1,20 +1,6 @@
-// =================================================================================================
-//  Lab 3 - Challenge 3 solution: the message format
-//  XJO - Xarxes per a Jocs Online
-// =================================================================================================
-//
-//  The only new idea of Lab 3 in this lobby. Every message is a byte[] that starts with one
-//  MsgType byte (slide 18), and the rest depends on that byte:
-//
-//    Text     01 | BinaryWriter string           the 2.2 lobby messages, unchanged: CHAT:hola...
-//    Player   02 | Serialize(PlayerDTO2)         name, level, Pokemon (slide 16)
-//
-//  The 2.2 text messages did not have to be rewritten: they travel inside a Text message.
-//  The transports (TCPLobby*, UDPLobby*) only lost their Encoding.UTF8 calls: they move byte[] now.
-// =================================================================================================
-
 using System;
 using System.IO;
+using UnityEngine;
 
 namespace Lab3Solution
 {
@@ -66,12 +52,56 @@ namespace Lab3Solution
             return type;
         }
 
+        
+        public static MsgType Read(byte[] data, out string text, out PlayerDTO2 player, out int objectId, out Vector3 pos)
+        {
+            text = null;
+            player = new PlayerDTO2();
+            objectId = 0;
+            pos = Vector3.zero;
+
+            if (data == null || data.Length < 1) throw new InvalidDataException("empty message");
+
+            MsgType type = (MsgType)data[0];
+            switch (type)
+            {
+                case MsgType.Text:
+                    BinaryReader readerText = new BinaryReader(new MemoryStream(data, 1, data.Length - 1));
+                    text = readerText.ReadString();
+                    break;
+
+                case MsgType.Player:
+                    byte[] bodyPlayer = new byte[data.Length - 1];
+                    Array.Copy(data, 1, bodyPlayer, 0, bodyPlayer.Length);
+                    player = SerializerSolution.DeserializePlayerDTO2(bodyPlayer);
+                    break;
+
+                case MsgType.Transform:
+                    byte[] bodyTransform = new byte[data.Length - 1];
+                    Array.Copy(data, 1, bodyTransform, 0, bodyTransform.Length);
+                    SerializerSolution.DeserializeTransform(bodyTransform, out objectId, out pos);
+                    break;
+
+                default:
+                    throw new InvalidDataException("unknown message type " + data[0]);
+            }
+            return type;
+        }
         public static string Describe(PlayerDTO2 dto)
         {
             string team = "";
             if (dto.ownedPokemons != null)
                 foreach (Pokemon p in dto.ownedPokemons) team += (team.Length > 0 ? ", " : "") + p.name;
             return "level " + dto.level + ", " + (team.Length > 0 ? team : "no Pokemon");
+        }
+
+        public static byte[] Transform(int objectId, Vector3 pos)
+        {
+            byte[] body = SerializerSolution.SerializeTransform(objectId, pos);
+            byte[] message = new byte[1 + body.Length];
+            message[0] = (byte)MsgType.Transform;
+            body.CopyTo(message, 1);
+            return message;
         }
     }
 }
