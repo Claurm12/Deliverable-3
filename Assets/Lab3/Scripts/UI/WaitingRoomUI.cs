@@ -7,7 +7,7 @@
 
 using UnityEngine;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public class WaitingRoomUI : MonoBehaviour
     {

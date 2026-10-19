@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public static class Messages
     {

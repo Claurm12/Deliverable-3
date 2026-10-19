@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public static class LobbyGUI
     {

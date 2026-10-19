@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public enum LobbyProtocol { TCP, UDP }
 

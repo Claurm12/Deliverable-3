@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public class MenuUI : MonoBehaviour
     {

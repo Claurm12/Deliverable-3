@@ -13,7 +13,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public class TCPLobbyClient : LobbyClient
     {

@@ -17,7 +17,7 @@ using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public class UDPLobbyServer : LobbyServer
     {

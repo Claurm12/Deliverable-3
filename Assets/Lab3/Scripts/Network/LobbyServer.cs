@@ -1,33 +1,9 @@
-// =================================================================================================
-//  Lab 3 - Challenge 3 solution: the lobby server, shared by TCP and UDP
-//  XJO - Xarxes per a Jocs Online
-// =================================================================================================
-//
-//  The Lab 2.2 solution's LobbyServer with serialization added. What changed:
-//    - messages arrive as byte[] and are read with Messages.Read (type byte first, slide 18)
-//    - joining is a Player message: the client's PlayerDTO2 replaces 2.2's JOIN:<name>
-//    - the server keeps every player's PlayerDTO2 and sends all of them to everyone on each
-//      change, as Player messages, so every waiting room shows every team
-//  Everything else (CHAT, PING, LEAVE, kick, start, the rules of the room) is the 2.2 code,
-//  travelling as Text messages.
-//
-//  MESSAGES
-//    client to server   Player(PlayerDTO2)   Text: CHAT:<text>  LEAVE:  PING:<clientMs>,<lastPingMs>
-//    server to client   Player(PlayerDTO2), one per player
-//                       Text: PLAYERS:<name>,...  CHAT:<name>: <text>  ROOM:<info>  PONG:<clientMs>
-//                             ERROR:<reason>  KICKED:  START:
-//
-//  THREADS (Lab 2.2 slide 10)
-//    Network threads only push into m_inbox. Update() empties it on the main thread, so the
-//    player list is only ever touched by the main thread and needs no lock.
-// =================================================================================================
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public abstract class LobbyServer : MonoBehaviour
     {
@@ -65,7 +41,6 @@ namespace Lab3Solution
         protected void SendText(object connection, string text) { Send(connection, Messages.Text(text)); }
 
         // ----------------------------------------------------------------------------- main thread
-
         protected virtual void Update()
         {
             NetEvent e;
@@ -75,11 +50,16 @@ namespace Lab3Solution
 
                 string text;
                 PlayerDTO2 dto;
+                int objectId;
+                Vector3 pos;
                 MsgType type;
-                try { type = Messages.Read(e.data, out text, out dto); }
+
+                try
+                {
+                    type = Messages.Read(e.data, out text, out dto, out objectId, out pos);
+                }
                 catch (Exception ex)
                 {
-                    // Garbage, or a 2.2 client still sending plain text: drop it, keep the room alive.
                     Log("[SERVER] Dropped a bad message from " + Describe(e.from) + ": " + ex.Message);
                     continue;
                 }
@@ -88,6 +68,7 @@ namespace Lab3Solution
                 if (player != null) player.lastSeen = Time.realtimeSinceStartup;
 
                 if (type == MsgType.Player) OnPlayerData(e.from, player, dto);
+                else if (type == MsgType.Transform) OnTransform(e.from, player, objectId, pos);
                 else OnText(e.from, player, text);
             }
         }
@@ -150,6 +131,19 @@ namespace Lab3Solution
             Log("[SERVER] " + name + " joined (" + Describe(from) + "): " + Messages.Describe(dto));
             BroadcastSystem(name + " joined");
             SendRoomState();
+        }
+
+        void OnTransform(object from, Player player, int objectId, Vector3 pos)
+        {
+            if (player == null) return; // Solo para las jugadores que esten en sala
+
+            byte[] transformPacket = Messages.Transform(objectId, pos);
+
+            // Renvia la posicion de todos los jugadores
+            foreach (Player p in m_players)
+            {
+                Send(p.connection, transformPacket);
+            }
         }
 
         void Refuse(object to, string reason)

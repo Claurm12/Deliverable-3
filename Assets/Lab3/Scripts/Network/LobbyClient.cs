@@ -1,24 +1,9 @@
-// =================================================================================================
-//  Lab 3 - Challenge 3 solution: the lobby client, shared by TCP and UDP
-// =================================================================================================
-//
-//  The Lab 2.2 solution's LobbyClient with serialization added. What changed:
-//    - messages arrive as byte[] and are read with Messages.Read (type byte first, slide 18)
-//    - joining sends 'myData', a PlayerDTO2, instead of JOIN:<name> (see JoinMessage)
-//    - Player messages from the server fill 'Teams', so the waiting room shows every team
-//  Everything else is the 2.2 code, travelling as Text messages.
-//
-//  The client PINGs every second with its own clock time. The server echoes it back in PONG, so
-//  now - echoed time = round trip. The client reports that number in its next PING, which is how
-//  the host gets the ping of every player. In UDP the same PING is what keeps the player alive.
-// =================================================================================================
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public abstract class LobbyClient : MonoBehaviour
     {
@@ -46,6 +31,9 @@ namespace Lab3Solution
         protected float m_lastHeard;           // last time anything arrived from the server
         float m_lastPing;
         bool m_closed;
+
+
+        public event Action<int, Vector3> TransformReceived;
 
         // ------------------------------------------------------------------ what TCP and UDP provide
 
@@ -93,12 +81,32 @@ namespace Lab3Solution
 
                 string text;
                 PlayerDTO2 dto;
+                int objectId;
+                Vector3 pos;
                 MsgType type;
-                try { type = Messages.Read(data, out text, out dto); }
-                catch (Exception e) { Log("[CLIENT " + userName + "] Dropped a bad message: " + e.Message); continue; }
 
-                if (type == MsgType.Player) OnPlayerData(dto);
-                else OnText(text);
+                try
+                {
+                    type = Messages.Read(data, out text, out dto, out objectId, out pos);
+                }
+                catch (Exception e)
+                {
+                    Log("[CLIENT " + userName + "] Dropped a bad message: " + e.Message);
+                    continue;
+                }
+
+                if (type == MsgType.Player)
+                {
+                    OnPlayerData(dto);
+                }
+                else if (type == MsgType.Transform)
+                {
+                    if (TransformReceived != null) TransformReceived(objectId, pos);
+                }
+                else
+                {
+                    OnText(text);
+                }
             }
 
             if (!m_closed && InRoom && Time.realtimeSinceStartup - m_lastPing >= pingSeconds)
@@ -174,7 +182,14 @@ namespace Lab3Solution
             if (Closed != null) Closed(reason);
         }
 
-        void OnDestroy() { if (!m_closed) { m_closed = true; CloseSocket(); } }
+        void OnDestroy()
+        {
+            if (!m_closed)
+            {
+                m_closed = true;
+                CloseSocket();
+            }
+        }
 
         protected void Log(string message) { LobbySession.Log(message); }
     }

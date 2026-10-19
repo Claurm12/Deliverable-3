@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Lab3Solution
+namespace Delivery3
 {
     public class GameUI : MonoBehaviour
     {
@@ -13,13 +13,15 @@ namespace Lab3Solution
         private int m_myObjectId;
         private bool m_moveW, m_moveS, m_moveA, m_moveD;
 
+        // Guarda los "cubos" segun la ip de cada jugador
+        private readonly Dictionary<int, GameObject> m_remotePlayers = new Dictionary<int, GameObject>();
+
         void Start()
         {
             if (LobbyGUI.NeedsSession()) return;
             LobbySession session = LobbySession.Instance;
             if (session.Client == null) return;
 
-         
             if (Camera.main == null)
             {
                 GameObject camObj = new GameObject("MainCamera");
@@ -35,6 +37,10 @@ namespace Lab3Solution
                 Light light = lightObj.AddComponent<Light>();
                 light.type = LightType.Directional;
                 lightObj.transform.eulerAngles = new Vector3(50, -30, 0);
+            }
+            if (session.Client != null)
+            {
+                session.Client.TransformReceived += OnRemoteTransformReceived;
             }
 
             string myName = session.Client.userName;
@@ -53,7 +59,7 @@ namespace Lab3Solution
             LobbySession session = LobbySession.Instance;
             LobbyClient client = session.Client;
 
-            //Movimiento
+            // Movimiento
             if (m_myPlayerObject != null)
             {
                 float moveSpeed = 6f;
@@ -71,7 +77,7 @@ namespace Lab3Solution
                     m_myPlayerObject.transform.position += direction.normalized * moveSpeed * Time.deltaTime;
                 }
 
-                //Posición
+                // Actualización de la posicion UPD
                 m_sendTimer += Time.deltaTime;
                 if (m_sendTimer >= 0.05f)
                 {
@@ -88,11 +94,18 @@ namespace Lab3Solution
                     }
                 }
             }
+
+            // Recibe los paquetes de los otros "cubos"
+            ProcessIncomingTransformPackets(client);
+        }
+
+        void ProcessIncomingTransformPackets(LobbyClient client)
+        {
+            if (client == null) return;
         }
 
         void OnGUI()
         {
-            
             Event e = Event.current;
             if (e != null && (e.type == EventType.KeyDown || e.type == EventType.KeyUp))
             {
@@ -117,6 +130,23 @@ namespace Lab3Solution
             if (GUILayout.Button(session.IsHost ? "End game" : "Leave", GUILayout.Width(160), GUILayout.Height(40)))
                 client.Leave();
             LobbyGUI.End();
+        }
+        void OnRemoteTransformReceived(int objectId, Vector3 pos)
+        {
+            // Si el paquete que llega es nuestro se mueve en local y se descarta
+            if (objectId == m_myObjectId) return;
+
+            GameObject remoteObj;
+            if (!m_remotePlayers.TryGetValue(objectId, out remoteObj))
+            {
+                // Creamos el cubo de otro jugador si este no existe
+                remoteObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                remoteObj.name = "Player_Remote_" + objectId;
+                m_remotePlayers[objectId] = remoteObj;
+            }
+
+            // Actualizamos su posicion
+            remoteObj.transform.position = pos;
         }
     }
 }
