@@ -93,6 +93,42 @@ namespace Delivery3
                         udpClient.SendCustomBytes(packet);
                     }
                 }
+
+                //Limpiar jugadores
+                if (client != null && client.Players != null)
+                {
+                    List<int> idsToRemove = new List<int>();
+
+                    foreach (KeyValuePair<int, GameObject> pair in m_remotePlayers)
+                    {
+                        int objectId = pair.Key;
+                        bool playerStillInRoom = false;
+                        // Comprobamos si la id del obj concide con alguna de algun jugador
+                        foreach (string playerName in client.Players)
+                        {
+                            if (playerName.GetHashCode() == objectId)
+                            {
+                                playerStillInRoom = true;
+                                break;
+                            }
+                        }
+
+                        if (!playerStillInRoom)
+                        {
+                            idsToRemove.Add(objectId);
+                        }
+                    }
+
+                    // Si el jugador esta desconectado borramos su cubo
+                    foreach (int id in idsToRemove)
+                    {
+                        if (m_remotePlayers.TryGetValue(id, out GameObject obj))
+                        {
+                            if (obj != null) Destroy(obj);
+                            m_remotePlayers.Remove(id);
+                        }
+                    }
+                }
             }
 
             // Recibe los paquetes de los otros "cubos"
