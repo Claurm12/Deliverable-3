@@ -8,7 +8,12 @@ Documentación de la primera interacción del proyecto
 
 
 ## **Cómo ejecutar el proyecto**
-(quin .exe, qui fa de host i com s'hi connecta l'altre) i la versió de Unity
+### .exe Host
+
+### Cómo conectar .exe Client
+
+### Versión de Unity
+6000.3.16f1
 
 ## **Escena principal**
 
