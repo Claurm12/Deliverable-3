@@ -14,8 +14,14 @@ namespace Delivery3
         private bool m_moveW, m_moveS, m_moveA, m_moveD;
         private bool m_isTypingInChat = false;
 
-        // Guarda los "cubos" segun la ip de cada jugador
-        private readonly Dictionary<int, GameObject> m_remotePlayers = new Dictionary<int, GameObject>();
+        private class RemotePlayer
+        {
+            public GameObject gameObject;
+            public float lastReceiveTime;
+        }
+
+        // Guardamos los "cubos" que se relacionan con la id del obj
+        private readonly Dictionary<int, RemotePlayer> m_remotePlayers = new Dictionary<int, RemotePlayer>();
 
         void Start()
         {
@@ -78,7 +84,7 @@ namespace Delivery3
                     m_myPlayerObject.transform.position += direction.normalized * moveSpeed * Time.deltaTime;
                 }
 
-                // Se actualiza la posicion del UPD
+                // Se actualiza la posicion del UDP
                 m_sendTimer += Time.deltaTime;
                 if (m_sendTimer >= 0.05f)
                 {
@@ -100,11 +106,13 @@ namespace Delivery3
             if (client != null && client.Players != null)
             {
                 List<int> idsToRemove = new List<int>();
+                float currentTime = Time.realtimeSinceStartup;
 
-                foreach (KeyValuePair<int, GameObject> pair in m_remotePlayers)
+                foreach (KeyValuePair<int, RemotePlayer> pair in m_remotePlayers)
                 {
                     int objectId = pair.Key;
                     bool playerStillInRoom = false;
+
                     foreach (string playerName in client.Players)
                     {
                         if (playerName.GetHashCode() == objectId)
@@ -114,7 +122,7 @@ namespace Delivery3
                         }
                     }
 
-                    if (!playerStillInRoom)
+                    if (!playerStillInRoom || (currentTime - pair.Value.lastReceiveTime > 3.0f))
                     {
                         idsToRemove.Add(objectId);
                     }
@@ -122,9 +130,9 @@ namespace Delivery3
 
                 foreach (int id in idsToRemove)
                 {
-                    if (m_remotePlayers.TryGetValue(id, out GameObject obj))
+                    if (m_remotePlayers.TryGetValue(id, out RemotePlayer remotePlayer))
                     {
-                        if (obj != null) Destroy(obj);
+                        if (remotePlayer.gameObject != null) Destroy(remotePlayer.gameObject);
                         m_remotePlayers.Remove(id);
                     }
                 }
@@ -141,7 +149,6 @@ namespace Delivery3
 
         void OnGUI()
         {
-           
             m_isTypingInChat = (GUI.GetNameOfFocusedControl() == "chat");
 
             Event e = Event.current;
@@ -183,22 +190,25 @@ namespace Delivery3
                 client.Leave();
             LobbyGUI.End();
         }
+
         void OnRemoteTransformReceived(int objectId, Vector3 pos)
         {
             // Si el paquete que llega es nuestro se mueve en local y se descarta
             if (objectId == m_myObjectId) return;
 
-            GameObject remoteObj;
-            if (!m_remotePlayers.TryGetValue(objectId, out remoteObj))
+            RemotePlayer remotePlayer;
+            if (!m_remotePlayers.TryGetValue(objectId, out remotePlayer))
             {
                 // Creamos el cubo de otro jugador si este no existe
-                remoteObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                remoteObj.name = "Player_Remote_" + objectId;
-                m_remotePlayers[objectId] = remoteObj;
+                GameObject newObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                newObj.name = "Player_Remote_" + objectId;
+
+                remotePlayer = new RemotePlayer { gameObject = newObj, lastReceiveTime = Time.realtimeSinceStartup };
+                m_remotePlayers[objectId] = remotePlayer;
             }
 
-            // Actualizamos su posicion
-            remoteObj.transform.position = pos;
+            remotePlayer.gameObject.transform.position = pos;
+            remotePlayer.lastReceiveTime = Time.realtimeSinceStartup;
         }
     }
 }
