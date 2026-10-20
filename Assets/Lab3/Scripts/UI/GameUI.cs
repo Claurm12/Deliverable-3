@@ -13,9 +13,10 @@ namespace Delivery3
         private int m_myObjectId;
         private bool m_moveW, m_moveS, m_moveA, m_moveD;
         private bool m_jumpRequested = false;
+        private bool m_shootRequested = false;
         private bool m_isTypingInChat = false;
 
-        //salto
+        // Salto
         private float m_verticalVelocity = 0f;
         private const float m_gravity = -20f;
         private const float m_jumpForce = 8f;
@@ -51,14 +52,15 @@ namespace Delivery3
                 light.type = LightType.Directional;
                 lightObj.transform.eulerAngles = new Vector3(50, -30, 0);
             }
+
             if (session.Client != null)
             {
                 session.Client.TransformReceived += OnRemoteTransformReceived;
+                session.Client.ShootReceived += OnRemoteShootReceived;
             }
 
             string myName = session.Client.userName;
             m_myObjectId = myName.GetHashCode();
-
             // Cubo
             m_myPlayerObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             m_myPlayerObject.name = "Player_" + myName;
@@ -72,7 +74,7 @@ namespace Delivery3
             LobbySession session = LobbySession.Instance;
             LobbyClient client = session.Client;
 
-            // Si se escribe en el chat no se mueve el jugador 
+            // Si se escribe en el chat no se mueve el jugador
             if (!m_isTypingInChat && m_myPlayerObject != null)
             {
                 float moveSpeed = 6f;
@@ -86,7 +88,6 @@ namespace Delivery3
 
                 Vector3 direction = new Vector3(h, 0, v);
                 Vector3 currentPos = m_myPlayerObject.transform.position;
-
                 // Gestion del salto
                 if (m_jumpRequested && currentPos.y <= 0.51f)
                 {
@@ -94,7 +95,6 @@ namespace Delivery3
                     m_jumpRequested = false;
                 }
 
-                // Gravedad vertical
                 if (currentPos.y > 0.5f || m_verticalVelocity != 0f)
                 {
                     m_verticalVelocity += m_gravity * Time.deltaTime;
@@ -114,7 +114,7 @@ namespace Delivery3
 
                 m_myPlayerObject.transform.position = currentPos;
 
-                // Se actualiza la posicion del UDP
+                // Enviar posicion UDP
                 m_sendTimer += Time.deltaTime;
                 if (m_sendTimer >= 0.05f)
                 {
@@ -129,6 +129,16 @@ namespace Delivery3
                     {
                         udpClient.SendCustomBytes(packet);
                     }
+                }
+
+                //Disparar
+                if (m_shootRequested)
+                {
+                    m_shootRequested = false;
+                    Vector3 spawnPos = m_myPlayerObject.transform.position + Vector3.forward * 0.8f;
+                    Vector3 shootDir = Vector3.forward;
+
+                    SpawnAndSendBullet(session, client, m_myObjectId, spawnPos, shootDir);
                 }
             }
 
@@ -167,14 +177,29 @@ namespace Delivery3
                     }
                 }
             }
-
-            // Recibe los paquetes de los otros "cubos"
-            ProcessIncomingTransformPackets(client);
         }
 
-        void ProcessIncomingTransformPackets(LobbyClient client)
+        void SpawnAndSendBullet(LobbySession session, LobbyClient client, int objectId, Vector3 pos, Vector3 dir)
         {
-            if (client == null) return;
+            CreateBulletGameObject(pos, dir);
+
+            byte[] packet = Messages.Shoot(objectId, pos, dir);
+            if (session.IsHost && session.Server is UDPLobbyServer udpServer)
+            {
+                udpServer.BroadcastCustomBytes(packet);
+            }
+            else if (!session.IsHost && client is UDPLobbyClient udpClient)
+            {
+                udpClient.SendCustomBytes(packet);
+            }
+        }
+
+        void CreateBulletGameObject(Vector3 pos, Vector3 dir)
+        {
+            GameObject bullet = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bullet.transform.position = pos;
+            bullet.transform.localScale = Vector3.one * 0.4f;
+            bullet.AddComponent<BulletMover>();
         }
 
         void OnGUI()
@@ -182,14 +207,18 @@ namespace Delivery3
             m_isTypingInChat = (GUI.GetNameOfFocusedControl() == "chat");
 
             Event e = Event.current;
-            if (!m_isTypingInChat && e != null && (e.type == EventType.KeyDown || e.type == EventType.KeyUp))
+            if (!m_isTypingInChat && e != null)
             {
-                bool isDown = (e.type == EventType.KeyDown);
-                if (e.keyCode == KeyCode.W || e.keyCode == KeyCode.UpArrow) m_moveW = isDown;
-                if (e.keyCode == KeyCode.S || e.keyCode == KeyCode.DownArrow) m_moveS = isDown;
-                if (e.keyCode == KeyCode.A || e.keyCode == KeyCode.LeftArrow) m_moveA = isDown;
-                if (e.keyCode == KeyCode.D || e.keyCode == KeyCode.RightArrow) m_moveD = isDown;
-                if (e.keyCode == KeyCode.Space && isDown) m_jumpRequested = true;
+                if (e.type == EventType.KeyDown || e.type == EventType.KeyUp)
+                {
+                    bool isDown = (e.type == EventType.KeyDown);
+                    if (e.keyCode == KeyCode.W || e.keyCode == KeyCode.UpArrow) m_moveW = isDown;
+                    if (e.keyCode == KeyCode.S || e.keyCode == KeyCode.DownArrow) m_moveS = isDown;
+                    if (e.keyCode == KeyCode.A || e.keyCode == KeyCode.LeftArrow) m_moveA = isDown;
+                    if (e.keyCode == KeyCode.D || e.keyCode == KeyCode.RightArrow) m_moveD = isDown;
+                    if (e.keyCode == KeyCode.Space && isDown) m_jumpRequested = true;
+                    if (e.keyCode == KeyCode.F && isDown) m_shootRequested = true;
+                }
             }
             else if (m_isTypingInChat)
             {
@@ -198,6 +227,7 @@ namespace Delivery3
                 m_moveA = false;
                 m_moveD = false;
                 m_jumpRequested = false;
+                m_shootRequested = false;
             }
 
             if (LobbyGUI.NeedsSession()) return;
@@ -205,7 +235,7 @@ namespace Delivery3
             LobbyClient client = session.Client;
 
             LobbyGUI.Begin("GAME  (" + session.protocol + ")   " + client.RoomInfo);
-            GUILayout.Label("Move: W, A, S, D Jump: Space");
+            GUILayout.Label("Move: W, A, S, D Jump: Space Shoot: F");
             GUILayout.Label("Players: " + string.Join(", ", client.Players) +
                             "    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
 
@@ -237,6 +267,28 @@ namespace Delivery3
 
             remotePlayer.gameObject.transform.position = pos;
             remotePlayer.lastReceiveTime = Time.realtimeSinceStartup;
+        }
+
+        void OnRemoteShootReceived(int objectId, Vector3 pos, Vector3 dir)
+        {
+            if (objectId == m_myObjectId) return;
+            CreateBulletGameObject(pos, dir);
+        }
+    }
+
+    public class BulletMover : MonoBehaviour
+    {
+        private Vector3 m_direction = Vector3.forward;
+        private float m_speed = 12f;
+
+        void Start()
+        {
+            Destroy(gameObject, 3.0f);
+        }
+
+        void Update()
+        {
+            transform.position += m_direction * m_speed * Time.deltaTime;
         }
     }
 }

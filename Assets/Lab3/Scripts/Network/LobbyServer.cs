@@ -52,11 +52,12 @@ namespace Delivery3
                 PlayerDTO2 dto;
                 int objectId;
                 Vector3 pos;
+                Vector3 dir;
                 MsgType type;
 
                 try
                 {
-                    type = Messages.Read(e.data, out text, out dto, out objectId, out pos);
+                    type = Messages.Read(e.data, out text, out dto, out objectId, out pos, out dir);
                 }
                 catch (Exception ex)
                 {
@@ -69,6 +70,7 @@ namespace Delivery3
 
                 if (type == MsgType.Player) OnPlayerData(e.from, player, dto);
                 else if (type == MsgType.Transform) OnTransform(e.from, player, objectId, pos);
+                else if (type == MsgType.Shoot) OnShoot(e.from, player, objectId, pos, dir);
                 else OnText(e.from, player, text);
             }
         }
@@ -123,9 +125,9 @@ namespace Delivery3
                 return;
             }
 
-            if (Started)                       { Refuse(from, "The game has already started"); return; }
+            if (Started) { Refuse(from, "The game has already started"); return; }
             if (m_players.Count >= maxPlayers) { Refuse(from, "The room is full (" + maxPlayers + "/" + maxPlayers + ")"); return; }
-            if (FindByName(name) != null)      { Refuse(from, "The name " + name + " is already taken"); return; }
+            if (FindByName(name) != null) { Refuse(from, "The name " + name + " is already taken"); return; }
 
             m_players.Add(new Player { connection = from, data = dto, lastSeen = Time.realtimeSinceStartup });
             Log("[SERVER] " + name + " joined (" + Describe(from) + "): " + Messages.Describe(dto));
@@ -143,6 +145,19 @@ namespace Delivery3
             foreach (Player p in m_players)
             {
                 Send(p.connection, transformPacket);
+            }
+        }
+
+        void OnShoot(object from, Player player, int objectId, Vector3 pos, Vector3 dir)
+        {
+            if (player == null) return;
+
+            byte[] shootPacket = Messages.Shoot(objectId, pos, dir);
+
+            // Reenvía el disparo para tdos los jugadores
+            foreach (Player p in m_players)
+            {
+                Send(p.connection, shootPacket);
             }
         }
 

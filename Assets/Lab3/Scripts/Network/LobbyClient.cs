@@ -34,6 +34,7 @@ namespace Delivery3
 
 
         public event Action<int, Vector3> TransformReceived;
+        public event Action<int, Vector3, Vector3> ShootReceived;
 
         // ------------------------------------------------------------------ what TCP and UDP provide
 
@@ -83,11 +84,12 @@ namespace Delivery3
                 PlayerDTO2 dto;
                 int objectId;
                 Vector3 pos;
+                Vector3 dir;
                 MsgType type;
 
                 try
                 {
-                    type = Messages.Read(data, out text, out dto, out objectId, out pos);
+                    type = Messages.Read(data, out text, out dto, out objectId, out pos, out dir);
                 }
                 catch (Exception e)
                 {
@@ -102,6 +104,10 @@ namespace Delivery3
                 else if (type == MsgType.Transform)
                 {
                     if (TransformReceived != null) TransformReceived(objectId, pos);
+                }
+                else if (type == MsgType.Shoot)
+                {
+                    if (ShootReceived != null) ShootReceived(objectId, pos, dir);
                 }
                 else
                 {

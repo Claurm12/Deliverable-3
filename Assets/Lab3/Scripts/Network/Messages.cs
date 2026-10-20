@@ -52,13 +52,14 @@ namespace Delivery3
             return type;
         }
 
-        
-        public static MsgType Read(byte[] data, out string text, out PlayerDTO2 player, out int objectId, out Vector3 pos)
+
+        public static MsgType Read(byte[] data, out string text, out PlayerDTO2 player, out int objectId, out Vector3 pos, out Vector3 dir)
         {
             text = null;
             player = new PlayerDTO2();
             objectId = 0;
             pos = Vector3.zero;
+            dir = Vector3.zero;
 
             if (data == null || data.Length < 1) throw new InvalidDataException("empty message");
 
@@ -82,11 +83,18 @@ namespace Delivery3
                     SerializerSolution.DeserializeTransform(bodyTransform, out objectId, out pos);
                     break;
 
+                case MsgType.Shoot:
+                    byte[] bodyShoot = new byte[data.Length - 1];
+                    Array.Copy(data, 1, bodyShoot, 0, bodyShoot.Length);
+                    SerializerSolution.DeserializeShoot(bodyShoot, out objectId, out pos, out dir);
+                    break;
+
                 default:
                     throw new InvalidDataException("unknown message type " + data[0]);
             }
             return type;
         }
+
         public static string Describe(PlayerDTO2 dto)
         {
             string team = "";
@@ -103,5 +111,15 @@ namespace Delivery3
             body.CopyTo(message, 1);
             return message;
         }
+
+        public static byte[] Shoot(int objectId, Vector3 pos, Vector3 dir)
+        {
+            byte[] body = SerializerSolution.SerializeShoot(objectId, pos, dir);
+            byte[] message = new byte[1 + body.Length];
+            message[0] = (byte)MsgType.Shoot;
+            body.CopyTo(message, 1);
+            return message;
+        }
     }
 }
+
