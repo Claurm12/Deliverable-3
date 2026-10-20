@@ -1,6 +1,3 @@
-// Lab 3 solution: drawing helpers shared by the scene UIs. Plain OnGUI, readable on a projector.
-// Nothing here touches a socket: the UI only reads LobbySession / LobbyClient / LobbyServer.
-
 using UnityEngine;
 
 namespace Delivery3
@@ -61,8 +58,10 @@ namespace Delivery3
             GUILayout.BeginHorizontal();
             bool enter = Event.current.type == EventType.KeyDown &&
                          (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter);
+
             GUI.SetNextControlName("chat");
             input = GUILayout.TextField(input, 200);
+
             if ((GUILayout.Button("Send", GUILayout.Width(90)) || (enter && GUI.GetNameOfFocusedControl() == "chat"))
                 && input.Trim().Length > 0)
             {
@@ -74,13 +73,11 @@ namespace Delivery3
             return input;
         }
 
-        // Any scene opened with Play in the Editor without going through the menu.
         public static bool NeedsSession()
         {
             if (LobbySession.Instance.Client != null) return false;
             UnityEngine.SceneManagement.SceneManager.LoadScene(LobbySession.MenuScene);
             return true;
         }
-       
     }
 }

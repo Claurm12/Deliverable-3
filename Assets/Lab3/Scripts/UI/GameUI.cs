@@ -12,6 +12,7 @@ namespace Delivery3
         private float m_sendTimer;
         private int m_myObjectId;
         private bool m_moveW, m_moveS, m_moveA, m_moveD;
+        private bool m_isTypingInChat = false;
 
         // Guarda los "cubos" segun la ip de cada jugador
         private readonly Dictionary<int, GameObject> m_remotePlayers = new Dictionary<int, GameObject>();
@@ -59,8 +60,8 @@ namespace Delivery3
             LobbySession session = LobbySession.Instance;
             LobbyClient client = session.Client;
 
-            // Movimiento
-            if (m_myPlayerObject != null)
+            // Si se escribe en el chat no se mueve el jugador 
+            if (!m_isTypingInChat && m_myPlayerObject != null)
             {
                 float moveSpeed = 6f;
                 float h = 0f;
@@ -77,7 +78,7 @@ namespace Delivery3
                     m_myPlayerObject.transform.position += direction.normalized * moveSpeed * Time.deltaTime;
                 }
 
-                // Actualización de la posicion UPD
+                // Se actualiza la posicion del UPD
                 m_sendTimer += Time.deltaTime;
                 if (m_sendTimer >= 0.05f)
                 {
@@ -93,40 +94,38 @@ namespace Delivery3
                         udpClient.SendCustomBytes(packet);
                     }
                 }
+            }
 
-                //Limpiar jugadores
-                if (client != null && client.Players != null)
+            // Limpiar jugadores desconectados
+            if (client != null && client.Players != null)
+            {
+                List<int> idsToRemove = new List<int>();
+
+                foreach (KeyValuePair<int, GameObject> pair in m_remotePlayers)
                 {
-                    List<int> idsToRemove = new List<int>();
-
-                    foreach (KeyValuePair<int, GameObject> pair in m_remotePlayers)
+                    int objectId = pair.Key;
+                    bool playerStillInRoom = false;
+                    foreach (string playerName in client.Players)
                     {
-                        int objectId = pair.Key;
-                        bool playerStillInRoom = false;
-                        // Comprobamos si la id del obj concide con alguna de algun jugador
-                        foreach (string playerName in client.Players)
+                        if (playerName.GetHashCode() == objectId)
                         {
-                            if (playerName.GetHashCode() == objectId)
-                            {
-                                playerStillInRoom = true;
-                                break;
-                            }
-                        }
-
-                        if (!playerStillInRoom)
-                        {
-                            idsToRemove.Add(objectId);
+                            playerStillInRoom = true;
+                            break;
                         }
                     }
 
-                    // Si el jugador esta desconectado borramos su cubo
-                    foreach (int id in idsToRemove)
+                    if (!playerStillInRoom)
                     {
-                        if (m_remotePlayers.TryGetValue(id, out GameObject obj))
-                        {
-                            if (obj != null) Destroy(obj);
-                            m_remotePlayers.Remove(id);
-                        }
+                        idsToRemove.Add(objectId);
+                    }
+                }
+
+                foreach (int id in idsToRemove)
+                {
+                    if (m_remotePlayers.TryGetValue(id, out GameObject obj))
+                    {
+                        if (obj != null) Destroy(obj);
+                        m_remotePlayers.Remove(id);
                     }
                 }
             }
@@ -142,14 +141,25 @@ namespace Delivery3
 
         void OnGUI()
         {
+           
+            m_isTypingInChat = (GUI.GetNameOfFocusedControl() == "chat");
+
             Event e = Event.current;
-            if (e != null && (e.type == EventType.KeyDown || e.type == EventType.KeyUp))
+            if (!m_isTypingInChat && e != null && (e.type == EventType.KeyDown || e.type == EventType.KeyUp))
             {
                 bool isDown = (e.type == EventType.KeyDown);
                 if (e.keyCode == KeyCode.W || e.keyCode == KeyCode.UpArrow) m_moveW = isDown;
                 if (e.keyCode == KeyCode.S || e.keyCode == KeyCode.DownArrow) m_moveS = isDown;
                 if (e.keyCode == KeyCode.A || e.keyCode == KeyCode.LeftArrow) m_moveA = isDown;
                 if (e.keyCode == KeyCode.D || e.keyCode == KeyCode.RightArrow) m_moveD = isDown;
+            }
+            else if (m_isTypingInChat)
+            {
+                // Resetear las teclas para que no se quede pillado mientras escribes
+                m_moveW = false;
+                m_moveS = false;
+                m_moveA = false;
+                m_moveD = false;
             }
 
             if (LobbyGUI.NeedsSession()) return;
@@ -161,8 +171,14 @@ namespace Delivery3
             GUILayout.Label("Players: " + string.Join(", ", client.Players) +
                             "    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
 
-            m_chatInput = LobbyGUI.Chat(client, m_chatInput, Screen.height - 250);
+            // Chat a la izquierda para poder ver el juego
+            GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical(GUILayout.Width(400));
+            m_chatInput = LobbyGUI.Chat(client, m_chatInput, 220);
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
 
+            GUILayout.Space(10);
             if (GUILayout.Button(session.IsHost ? "End game" : "Leave", GUILayout.Width(160), GUILayout.Height(40)))
                 client.Leave();
             LobbyGUI.End();
