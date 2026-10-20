@@ -12,7 +12,13 @@ namespace Delivery3
         private float m_sendTimer;
         private int m_myObjectId;
         private bool m_moveW, m_moveS, m_moveA, m_moveD;
+        private bool m_jumpRequested = false;
         private bool m_isTypingInChat = false;
+
+        //salto
+        private float m_verticalVelocity = 0f;
+        private const float m_gravity = -20f;
+        private const float m_jumpForce = 8f;
 
         private class RemotePlayer
         {
@@ -20,7 +26,7 @@ namespace Delivery3
             public float lastReceiveTime;
         }
 
-        // Guardamos los "cubos" que se relacionan con la id del obj
+        //Guardamos los "cubos" que se relacionan con la id del obj
         private readonly Dictionary<int, RemotePlayer> m_remotePlayers = new Dictionary<int, RemotePlayer>();
 
         void Start()
@@ -79,10 +85,34 @@ namespace Delivery3
                 if (m_moveD) h += 1f;
 
                 Vector3 direction = new Vector3(h, 0, v);
+                Vector3 currentPos = m_myPlayerObject.transform.position;
+
+                // Gestion del salto
+                if (m_jumpRequested && currentPos.y <= 0.51f)
+                {
+                    m_verticalVelocity = m_jumpForce;
+                    m_jumpRequested = false;
+                }
+
+                // Gravedad vertical
+                if (currentPos.y > 0.5f || m_verticalVelocity != 0f)
+                {
+                    m_verticalVelocity += m_gravity * Time.deltaTime;
+                    currentPos.y += m_verticalVelocity * Time.deltaTime;
+
+                    if (currentPos.y <= 0.5f)
+                    {
+                        currentPos.y = 0.5f;
+                        m_verticalVelocity = 0f;
+                    }
+                }
+
                 if (direction.magnitude > 0.1f)
                 {
-                    m_myPlayerObject.transform.position += direction.normalized * moveSpeed * Time.deltaTime;
+                    currentPos += direction.normalized * moveSpeed * Time.deltaTime;
                 }
+
+                m_myPlayerObject.transform.position = currentPos;
 
                 // Se actualiza la posicion del UDP
                 m_sendTimer += Time.deltaTime;
@@ -159,14 +189,15 @@ namespace Delivery3
                 if (e.keyCode == KeyCode.S || e.keyCode == KeyCode.DownArrow) m_moveS = isDown;
                 if (e.keyCode == KeyCode.A || e.keyCode == KeyCode.LeftArrow) m_moveA = isDown;
                 if (e.keyCode == KeyCode.D || e.keyCode == KeyCode.RightArrow) m_moveD = isDown;
+                if (e.keyCode == KeyCode.Space && isDown) m_jumpRequested = true;
             }
             else if (m_isTypingInChat)
             {
-                // Resetear las teclas para que no se quede pillado mientras escribes
                 m_moveW = false;
                 m_moveS = false;
                 m_moveA = false;
                 m_moveD = false;
+                m_jumpRequested = false;
             }
 
             if (LobbyGUI.NeedsSession()) return;
@@ -174,11 +205,10 @@ namespace Delivery3
             LobbyClient client = session.Client;
 
             LobbyGUI.Begin("GAME  (" + session.protocol + ")   " + client.RoomInfo);
-            GUILayout.Label("Usa W, A, S, D para mover tu cubo en red.");
+            GUILayout.Label("Move: W, A, S, D Jump: Space");
             GUILayout.Label("Players: " + string.Join(", ", client.Players) +
                             "    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
 
-            // Chat a la izquierda para poder ver el juego
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(400));
             m_chatInput = LobbyGUI.Chat(client, m_chatInput, 220);
@@ -193,13 +223,11 @@ namespace Delivery3
 
         void OnRemoteTransformReceived(int objectId, Vector3 pos)
         {
-            // Si el paquete que llega es nuestro se mueve en local y se descarta
             if (objectId == m_myObjectId) return;
 
             RemotePlayer remotePlayer;
             if (!m_remotePlayers.TryGetValue(objectId, out remotePlayer))
             {
-                // Creamos el cubo de otro jugador si este no existe
                 GameObject newObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 newObj.name = "Player_Remote_" + objectId;
 
