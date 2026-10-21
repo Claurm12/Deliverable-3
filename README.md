@@ -2,10 +2,7 @@
 # ***Deliverable-3***
 
 Documentación de la primera interacción del proyecto
-
-
 # ***Documentación***
-
 
 ## **Cómo ejecutar el proyecto**
 ### .exe Host
@@ -16,6 +13,14 @@ Documentación de la primera interacción del proyecto
 6000.3.16f1
 
 ## **Escena principal**
+La primera escena que aparece al ejecutar el programa es la L3_Menu, de ahi va pasando por diferentes pantallas siguiendo este esquema:
+   <p align="center">  L3_Menu </p>
+   <p align="center">   ⬇️ </p>
+    <p align="center"> L3_WaitingRoom  </p>
+   <p align="center">  ⬇️  </p>
+   <p align="center"> L3_CreateGame / L3_JoinGame  </p>
+    <p align="center">  ⬇️  </p>
+    <p align="center"> L3_Game  </p>
 
 ## **Input**
 
@@ -38,10 +43,7 @@ Què ha canviat des de l'entrega 2
 | **Miembro** | **Tareas realizadas** | 
 | ------------- | ------------- |
 | *Claudia Ruiz*  | - Creacion Proyecto unity base <br> -   |
-| *Víctor González*  |- Base Readme  <br> -  |
-
-## Authors
+| *Víctor González*  |- Base Readme  <br> -  |## Authors
 
 - ***Cluadia Ruiz*** [@Claurm12](https://www.github.com/Claurm12)
 - ***Víctor González*** [@TheWolfG145](https://www.github.com/TheWolfG145)
-
