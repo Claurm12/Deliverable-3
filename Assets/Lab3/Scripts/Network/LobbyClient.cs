@@ -55,8 +55,6 @@ namespace Delivery3
             if (line.Length > 0) SendText("CHAT:" + line);
         }
 
-        // Level or team changed in the waiting room: send the whole PlayerDTO2 again. The server
-        // takes it as an update because it comes from a player already in the room.
         public void UpdateData(PlayerDTO2 data)
         {
             data.playerName = userName;

@@ -1,5 +1,3 @@
-// Lab 3 solution: L3_Menu. Your PlayerDTO2 (name, level, Pokemon), protocol, create or join.
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,12 +16,11 @@ namespace Delivery3
             LobbyGUI.Begin("XJO LOBBY  -  Lab 3 solution");
 
             session.playerName = LobbyGUI.Field("Your name", session.playerName);
-            session.playerLevel = LobbyGUI.IntField("Level", session.playerLevel, 1, 100);
-            session.playerTeam = LobbyGUI.Field("Pokemon", session.playerTeam, 360);
+            session.playerTeam = LobbyGUI.Field("Teams", session.playerTeam, 360);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Protocol", GUILayout.Width(140));
-            session.protocol = (LobbyProtocol)GUILayout.Toolbar((int)session.protocol, new[] { "TCP", "UDP" },
+            session.protocol = (LobbyProtocol)GUILayout.Toolbar((int)session.protocol, new[] { "TCP", "UDP" },//quitar TCP
                                                                  GUILayout.Width(220));
             GUILayout.EndHorizontal();
 

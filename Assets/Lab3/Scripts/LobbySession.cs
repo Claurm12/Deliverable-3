@@ -1,24 +1,3 @@
-// =================================================================================================
-//  Lab 3 - Challenge 3 solution: the session that survives scene changes
-// =================================================================================================
-//
-//  Sockets must outlive the scene that created them: Create game -> Waiting room -> Game.
-//  So the server and client components live on one DontDestroyOnLoad object, and every scene
-//  only draws UI and calls this class.
-//
-//  Scene flow
-//    L3_Menu -> L3_CreateGame -> (server starts, the host joins it as a player) -> L3_WaitingRoom
-//    L3_Menu -> L3_JoinGame   -> (first PLAYERS received)                       -> L3_WaitingRoom
-//    L3_WaitingRoom -> (host presses Start, everyone gets START:)               -> L3_Game
-//    Any scene     -> (left, kicked, refused, connection lost)                -> L3_Menu + reason
-//
-//  The host also plays (bonus): Host() starts the server and then joins it through 127.0.0.1
-//  like any other client. Same code path, so the host sees exactly what the others see.
-//
-//  Lab 3: the player is now a PlayerDTO2 (name, level, Pokemon), built in MakePlayerData() from
-//  what the menu asks for. Joining sends it instead of the 2.2 JOIN:<name>.
-// =================================================================================================
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,16 +9,16 @@ namespace Delivery3
 
     public class LobbySession : MonoBehaviour
     {
+        [Header("SALAS")]
         public const string MenuScene = "L3_Menu";
         public const string CreateScene = "L3_CreateGame";
         public const string JoinScene = "L3_JoinGame";
         public const string RoomScene = "L3_WaitingRoom";
         public const string GameScene = "L3_Game";
 
-        public LobbyProtocol protocol = LobbyProtocol.TCP;
+        public LobbyProtocol protocol = LobbyProtocol.UDP;//quitar TCP
         public string playerName = "Player";
-        public int playerLevel = 12;
-        public string playerTeam = "Pikachu, Charmander";   // comma separated, as typed in the menu
+        public string playerTeam = "Hunter, Chased";   // comma separated, as typed in the menu
         public string message = "";            // why the last session ended, shown in the menu
 
         public LobbyServer Server { get; private set; }
@@ -80,8 +59,8 @@ namespace Delivery3
         public bool Host(string serverName, int port, int maxPlayers)
         {
             EndSession();
-            Server = protocol == LobbyProtocol.TCP
-                ? (LobbyServer)gameObject.AddComponent<TCPLobbyServer>()
+            Server = protocol == LobbyProtocol.UDP
+                ? (LobbyServer)gameObject.AddComponent<TCPLobbyServer>()//quitar TCP
                 : gameObject.AddComponent<UDPLobbyServer>();
             Server.serverName = serverName;
             Server.port = port;
@@ -103,7 +82,7 @@ namespace Delivery3
             if (Client != null) { Destroy(Client); Client = null; }
             message = "";
 
-            Client = protocol == LobbyProtocol.TCP
+            Client = protocol == LobbyProtocol.UDP
                 ? (LobbyClient)gameObject.AddComponent<TCPLobbyClient>()
                 : gameObject.AddComponent<UDPLobbyClient>();
             Client.serverIp = ip.Trim();
@@ -119,7 +98,7 @@ namespace Delivery3
 
         public PlayerDTO2 MakePlayerData()
         {
-            PlayerDTO2 data = new PlayerDTO2 { playerName = playerName.Trim(), level = playerLevel, ownedPokemons = new List<Pokemon>() };
+            PlayerDTO2 data = new PlayerDTO2 { playerName = playerName.Trim(), ownedPokemons = new List<Pokemon>() };
             foreach (string name in playerTeam.Split(','))
                 if (name.Trim().Length > 0) data.ownedPokemons.Add(new Pokemon { name = name.Trim() });
             return data;
@@ -138,13 +117,6 @@ namespace Delivery3
             if (Server != null) { Server.StopServer(); Destroy(Server); Server = null; }
         }
 
-        // ---------------------------------------------------------------------------------------
-        //  Test hooks, so the whole flow can run without anybody clicking. Not part of the exercise.
-        //    -proto tcp|udp  -name N  -port P  -host ROOM  -max M  -join IP
-        //    -chat TEXT -chatat S   -startat S   -kick NAME -kickat S   -leaveat S   -quitat S
-        //    -level N  -team "A,B" (or none)   -relevel N -relevelat S   (Lab 3: data sent on join, then an update)
-        // ---------------------------------------------------------------------------------------
-
         readonly Dictionary<string, string> m_args = new Dictionary<string, string>();
         float m_lastPingLog;
 
@@ -156,7 +128,6 @@ namespace Delivery3
                     m_args[args[i].Substring(1)] = args[++i];
             if (m_args.ContainsKey("proto")) protocol = m_args["proto"] == "udp" ? LobbyProtocol.UDP : LobbyProtocol.TCP;
             if (m_args.ContainsKey("name")) playerName = m_args["name"];
-            if (m_args.ContainsKey("level")) playerLevel = int.Parse(m_args["level"]);
             if (m_args.ContainsKey("team")) playerTeam = m_args["team"] == "none" ? "" : m_args["team"];
         }
 
@@ -177,12 +148,6 @@ namespace Delivery3
 
             if (Client != null && Client.InRoom && m_args.ContainsKey("chat") && t >= Arg("chatat"))
             { Client.SendChat(m_args["chat"]); m_args.Remove("chat"); }
-
-            if (Client != null && Client.InRoom && m_args.ContainsKey("relevel") && t >= Arg("relevelat"))
-            {
-                playerLevel = int.Parse(m_args["relevel"]); m_args.Remove("relevel");
-                Client.UpdateData(MakePlayerData());
-            }
 
             if (IsHost && m_args.ContainsKey("startat") && t >= Arg("startat"))
             { m_args.Remove("startat"); Server.StartGame(); }

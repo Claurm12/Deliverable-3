@@ -1,17 +1,3 @@
-// =================================================================================================
-//  Lab 3 - Challenge 3 solution: UDP transport of the lobby client
-// =================================================================================================
-//
-//  The 2.1 UDP client: no Connect, the server address goes in every SendTo.
-//  What is new for the lobby:
-//    - the join message (our PlayerDTO2) can be lost, so it is repeated every second until
-//      the first player list arrives
-//
-//  Lab 3: packets stay byte[]. SendBytes and the receive loop lost their Encoding.UTF8 calls.
-//    - nothing tells us the server is gone (Lab 2.2 slide 9): if it says nothing for timeoutSeconds,
-//      even though we PING every second, we consider it lost
-// =================================================================================================
-
 using System;
 using System.Net;
 using System.Net.Sockets;

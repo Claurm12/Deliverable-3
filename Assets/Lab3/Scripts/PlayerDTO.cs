@@ -17,7 +17,6 @@ using System.Collections.Generic;
 public struct PlayerDTO
 {
     public string playerName;
-    public int level;
     public List<string> ownedPokemons;
 }
 
@@ -32,7 +31,6 @@ public class Pokemon
 public struct PlayerDTO2
 {
     public string playerName;
-    public int level;
     public List<Pokemon> ownedPokemons;
 }
 

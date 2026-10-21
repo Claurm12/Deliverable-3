@@ -1,6 +1,3 @@
-// Lab 3 solution: L3_CreateGame. Starts the server, then the host joins it as a player.
-// The scene changes to L3_WaitingRoom when the host's own client receives the first player list.
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,6 +7,7 @@ namespace Delivery3
     {
         string m_roomName = "MyRoom";
         string m_port = "9050";
+        string m_ip = "9050";//mostrar ip propia por pantalla
         int m_maxPlayers = 4;
         bool m_creating;
 
@@ -38,7 +36,7 @@ namespace Delivery3
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
-            GUILayout.Label("Others join with your IP (ipconfig) and port " + m_port);
+            GUILayout.Label("Others join with your IP (ipconfig): " + m_ip + " and port " + m_port);
             LobbyGUI.Message(session.message);
             LobbyGUI.End();
         }

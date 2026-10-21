@@ -6,29 +6,18 @@ using UnityEngine;
 
 public static class SerializerSolution
 {
-    // --------------------------------------------------------------------------------- TODO 1 ---
-    //  Goal: write every field of 'dto' into 'writer'.
-    //  Order: playerName, level, then the list. For a list, first how many, then each one (slide 6).
-    //  Look it up: BinaryWriter.Write in the docs. It has one overload per type.
-    //  Test scene when it works:  {"Ash", 12, [Pikachu, Charmander]} -> serialized 31 bytes
     public static byte[] Serialize(PlayerDTO dto)
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter writer = new BinaryWriter(stream);
 
         writer.Write(dto.playerName);
-        writer.Write(dto.level);
         writer.Write(dto.ownedPokemons.Count);
         foreach (string pokemon in dto.ownedPokemons) writer.Write(pokemon);
 
         return stream.ToArray();
     }
 
-    // --------------------------------------------------------------------------------- TODO 2 ---
-    //  Goal: read the fields back from 'reader' into 'dto'.
-    //  Same order and same types as TODO 1 (slide 7). The bytes do not say what they are.
-    //  Look it up: BinaryReader.ReadString / ReadInt32 in the docs.
-    //  Test scene when it works:  playerName PASS, level PASS, ownedPokemons PASS
     public static PlayerDTO DeserializePlayerDTO(byte[] data)
     {
         BinaryReader reader = new BinaryReader(new MemoryStream(data));
@@ -36,41 +25,31 @@ public static class SerializerSolution
         dto.ownedPokemons = new List<string>();
 
         dto.playerName = reader.ReadString();
-        dto.level = reader.ReadInt32();
         int count = reader.ReadInt32();
         for (int i = 0; i < count; i++) dto.ownedPokemons.Add(reader.ReadString());
 
         return dto;
     }
 
-    // --------------------------------------------------------------------------------- TODO 3 ---
-    //  Goal: the same as TODO 1, for PlayerDTO2. The list now holds Pokemon objects (slide 16).
-    //  You cannot write an object: write the fields it has.
-    //  Test scene when it works:  [Challenge 2] same bytes as Challenge 1: yes
     public static byte[] Serialize(PlayerDTO2 dto)
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter writer = new BinaryWriter(stream);
 
         writer.Write(dto.playerName);
-        writer.Write(dto.level);
-        writer.Write(dto.ownedPokemons.Count);
+        writer.Write(dto.ownedPokemons.Count);//limpiar pokemons por equipos
         foreach (Pokemon pokemon in dto.ownedPokemons) writer.Write(pokemon.name);
 
         return stream.ToArray();
     }
 
-    // --------------------------------------------------------------------------------- TODO 4 ---
-    //  Goal: the same as TODO 2, for PlayerDTO2. Create one Pokemon per item and fill its fields.
-    //  Test scene when it works:  playerName PASS, level PASS, ownedPokemons PASS
     public static PlayerDTO2 DeserializePlayerDTO2(byte[] data)
     {
         BinaryReader reader = new BinaryReader(new MemoryStream(data));
         PlayerDTO2 dto = new PlayerDTO2();
-        dto.ownedPokemons = new List<Pokemon>();
+        dto.ownedPokemons = new List<Pokemon>();//limpiar pokemons por equipos
 
         dto.playerName = reader.ReadString();
-        dto.level = reader.ReadInt32();
         int count = reader.ReadInt32();
         for (int i = 0; i < count; i++)
         {
@@ -82,11 +61,6 @@ public static class SerializerSolution
         return dto;
     }
 
-    // --------------------------------------------------------------------------------- TODO 5 ---
-    //  Goal: the same round trip with JSON (slides 10 and 11). Two methods, one line each.
-    //  ToJson: object -> JSON string -> bytes.  FromJson: bytes -> JSON string -> object.
-    //  Look it up: JsonUtility.ToJson / FromJson, and Encoding.UTF8.GetBytes / GetString.
-    //  Test scene when it works:  JSON is 90 bytes, binary is 31
     public static byte[] ToJson(PlayerDTO2 dto)
     {
         return Encoding.UTF8.GetBytes(JsonUtility.ToJson(dto));
@@ -97,11 +71,6 @@ public static class SerializerSolution
         return JsonUtility.FromJson<PlayerDTO2>(Encoding.UTF8.GetString(data));
     }
 
-    // =============================================================================================
-    //  GIVEN CODE
-    // =============================================================================================
-
-    // "03 41 73 68 0C 00 00 00": the bytes as you saw them on slide 8.
     public static string ToHex(byte[] data)
     {
         if (data == null) return "(null)";

@@ -1,16 +1,3 @@
-// =================================================================================================
-//  Lab 3 - Challenge 3 solution: UDP transport of the lobby server
-// =================================================================================================
-//
-//  The 2.1 UDP server: one socket for everybody, one receive thread, no framing.
-//  What is new for the lobby:
-//    - the endpoint that ReceiveFrom fills in IS the player's identity (Lab 2.2 slide 7)
-//    - nothing tells us a client is gone (Lab 2.2 slide 9). Clients PING every second, LobbyServer stores
-//      the time of the last message of each player, and Update() removes the silent ones
-//
-//  Lab 3: packets stay byte[]. Send and the receive loop lost their Encoding.UTF8 calls.
-// =================================================================================================
-
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -78,14 +65,14 @@ namespace Delivery3
                 try { received = m_socket.ReceiveFrom(buffer, ref from); }
                 catch (SocketException e)
                 {
-                    // An earlier SendTo reached a closed port (2.1 slide 34). Not this receive: go on.
+                   
                     if (e.SocketErrorCode == SocketError.ConnectionReset) continue;
                     return;
                 }
                 catch (ObjectDisposedException) { return; }
                 catch (NullReferenceException) { return; }
 
-                byte[] payload = new byte[received];   // one datagram = one message: no framing (slide 19)
+                byte[] payload = new byte[received]; 
                     Array.Copy(buffer, payload, received);
                     m_inbox.Enqueue(new NetEvent { from = from, data = payload });
             }
@@ -97,7 +84,6 @@ namespace Delivery3
         {
             base.Update();
 
-            // The only way to notice a closed window or a crash in UDP (Lab 2.2 slide 9).
             float now = Time.realtimeSinceStartup;
             foreach (Player p in Players)
                 if (now - p.lastSeen > timeoutSeconds) { RemovePlayer(p, "timed out"); break; }

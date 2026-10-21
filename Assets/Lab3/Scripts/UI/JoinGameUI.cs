@@ -1,7 +1,3 @@
-// Lab 3 solution: L3_JoinGame. Server IP and port, then Join.
-// The scene changes to L3_WaitingRoom on the first player list, or back to L3_Menu with the reason
-// (refused, room full, name taken, no answer).
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

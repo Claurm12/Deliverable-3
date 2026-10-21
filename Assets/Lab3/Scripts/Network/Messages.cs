@@ -100,7 +100,7 @@ namespace Delivery3
             string team = "";
             if (dto.ownedPokemons != null)
                 foreach (Pokemon p in dto.ownedPokemons) team += (team.Length > 0 ? ", " : "") + p.name;
-            return "level " + dto.level + ", " + (team.Length > 0 ? team : "no Pokemon");
+            return (team.Length > 0 ? team : "no TEAM");
         }
 
         public static byte[] Transform(int objectId, Vector3 pos)

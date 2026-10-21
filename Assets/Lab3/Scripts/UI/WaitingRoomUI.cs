@@ -1,10 +1,3 @@
-// Lab 3 solution: L3_WaitingRoom. Player list with every player's PlayerDTO2 (level, Pokemon),
-// chat, Leave, and your own level to change: it is sent again as a Player message and everybody's
-// list updates. The host also gets every player's ping, Kick buttons and Start.
-//
-// The host reads pings and connections straight from its own server object. Everybody else only
-// has what the server sent: PLAYERS: for the names, Player messages for the data.
-
 using UnityEngine;
 
 namespace Delivery3
@@ -23,12 +16,6 @@ namespace Delivery3
             GUILayout.BeginHorizontal();
             GUILayout.Label("You are " + client.userName + (session.IsHost ? " (host)" : "") +
                             "    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"), GUILayout.Width(420));
-            int level = LobbyGUI.IntField("Your level", session.playerLevel, 1, 100);
-            if (level != session.playerLevel)
-            {
-                session.playerLevel = level;
-                client.UpdateData(session.MakePlayerData());
-            }
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
