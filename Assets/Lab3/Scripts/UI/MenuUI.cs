@@ -16,7 +16,6 @@ namespace Delivery3
             LobbyGUI.Begin("XJO LOBBY  -  Lab 3 solution");
 
             session.playerName = LobbyGUI.Field("Your name", session.playerName);
-            session.playerTeam = LobbyGUI.Field("Teams", session.playerTeam, 360);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Protocol", GUILayout.Width(140));
