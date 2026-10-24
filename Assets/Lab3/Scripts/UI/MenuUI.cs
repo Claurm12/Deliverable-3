@@ -20,8 +20,8 @@ namespace Delivery3
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Protocol", GUILayout.Width(140));
-            session.protocol = (LobbyProtocol)GUILayout.Toolbar((int)session.protocol, new[] { "TCP", "UDP" },//quitar TCP
-                                                                 GUILayout.Width(220));
+            session.protocol = LobbyProtocol.UDP;
+            GUILayout.Label("UDP", GUILayout.Width(220));
             GUILayout.EndHorizontal();
 
             GUILayout.Space(15);
