@@ -77,14 +77,14 @@ namespace Delivery3
             if (playerObj == null) return;
 
             LobbySession session = LobbySession.Instance;
-            string rolActual = "Chased"; 
+            string rolActual = "Chased";
             PlayerDTO2 data;
 
             if (session.Client != null && session.Client.Teams.TryGetValue(playerName, out data))
             {
-                if (data.ownedPokemons != null && data.ownedPokemons.Count > 0)
+                if (!string.IsNullOrEmpty(data.playerRole))
                 {
-                    rolActual = data.ownedPokemons[0].name;
+                    rolActual = data.playerRole;
                 }
             }
 

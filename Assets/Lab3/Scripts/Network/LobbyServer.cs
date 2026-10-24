@@ -109,18 +109,17 @@ namespace Delivery3
         // (UDP resends until answered) or an update of its data.
         void OnPlayerData(object from, Player player, PlayerDTO2 dto)
         {
-            // PLAYERS: is still a comma-separated text list, so names keep the 2.2 restrictions.
             string name = (dto.playerName ?? "").Replace(",", "").Replace(":", "").Trim();
             if (name.Length == 0) name = "Player";
             dto.playerName = name;
-            if (dto.ownedPokemons == null) dto.ownedPokemons = new List<Pokemon>();
+
+            if (string.IsNullOrEmpty(dto.playerRole)) dto.playerRole = "Chased";
 
             if (player != null)
             {
-                if (dto.playerName != player.name) { SendRoomStateTo(from); return; }   // no renames in the room
+                if (dto.playerName != player.name) { SendRoomStateTo(from); return; }
                 if (Messages.Describe(dto) == Messages.Describe(player.data)) { SendRoomStateTo(from); return; }
                 player.data = dto;
-                Log("[SERVER] " + name + " updated: " + Messages.Describe(dto));
                 SendRoomState();
                 return;
             }
@@ -130,7 +129,6 @@ namespace Delivery3
             if (FindByName(name) != null) { Refuse(from, "The name " + name + " is already taken"); return; }
 
             m_players.Add(new Player { connection = from, data = dto, lastSeen = Time.realtimeSinceStartup });
-            Log("[SERVER] " + name + " joined (" + Describe(from) + "): " + Messages.Describe(dto));
             BroadcastSystem(name + " joined");
             SendRoomState();
         }
@@ -204,36 +202,29 @@ namespace Delivery3
                 for (int i = 0; i < m_players.Count; i++)
                 {
                     Player p = m_players[i];
-
-                    if (p.data.ownedPokemons == null) p.data.ownedPokemons = new List<Pokemon>();
-                    else p.data.ownedPokemons.Clear();
-
                     int rolDesignado = (i == hunterIndex) ? 0 : 1;
 
                     switch (rolDesignado)
                     {
                         case 0:
-                            p.data.ownedPokemons.Add(new Pokemon { name = "Hunter" });
+                            p.data.playerRole = "Hunter";
                             SendText(p.connection, "Eres el CAZADOR");
                             break;
-
                         case 1:
-                            p.data.ownedPokemons.Add(new Pokemon { name = "Chased" });
+                            p.data.playerRole = "Chased";
                             SendText(p.connection, "Escapa del cazador");
                             break;
-
                         default:
-                            p.data.ownedPokemons.Add(new Pokemon { name = "Chased" });
-                            SendText(p.connection, "Eres el CAZADOR");
+                            p.data.playerRole = "Chased";
+                            SendText(p.connection, "Escapa del cazador");
                             break;
                     }
                 }
-
+       
                 SendRoomState();
             }
 
             Started = true;
-            Log("[SERVER] Game started with " + Names(", "));
             Broadcast("START:");
         }
 

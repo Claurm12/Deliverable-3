@@ -97,10 +97,7 @@ namespace Delivery3
 
         public static string Describe(PlayerDTO2 dto)
         {
-            string team = "";
-            if (dto.ownedPokemons != null)
-                foreach (Pokemon p in dto.ownedPokemons) team += (team.Length > 0 ? ", " : "") + p.name;
-            return (team.Length > 0 ? team : "no TEAM");
+            return !string.IsNullOrEmpty(dto.playerRole) ? dto.playerRole : "Chased";
         }
 
         public static byte[] Transform(int objectId, Vector3 pos)

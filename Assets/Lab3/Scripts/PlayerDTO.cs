@@ -1,45 +1,24 @@
-// =================================================================================================
-//  Lab 3 - Data serialization: THE DATA YOU SEND
-//  XJO - Xarxes per a Jocs Online
-// =================================================================================================
-//
-//  Given. Do not change it: the test scene and the slides use these exact fields.
-//  A DTO (data transfer object) is a small class or struct made only to be sent (slide 13).
-//  Never send a GameObject or a MonoBehaviour.
-//
-// =================================================================================================
-
 using System;
 using System.Collections.Generic;
 
-// Challenge 1 (slide 15)
 [Serializable]
 public struct PlayerDTO
 {
     public string playerName;
-    public List<string> ownedPokemons;
-}
-
-// Challenge 2 (slide 16)
-[Serializable]
-public class Pokemon
-{
-    public string name;
+    public string playerRole; 
 }
 
 [Serializable]
 public struct PlayerDTO2
 {
     public string playerName;
-    public List<Pokemon> ownedPokemons;
+    public string playerRole; 
 }
 
-// Challenge 3 (slide 18): the first byte of every message says what follows.
 public enum MsgType : byte
 {
-    Text = 1,     // your lobby messages as they are now: JOIN:Anna, CHAT:hello...
-    Player = 2,   // a PlayerDTO2
+    Text = 1,
+    Player = 2,
     Transform = 3,
     Shoot = 4
-
 }

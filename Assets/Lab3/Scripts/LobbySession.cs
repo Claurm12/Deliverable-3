@@ -94,10 +94,11 @@ namespace Delivery3
 
         public PlayerDTO2 MakePlayerData()
         {
-            PlayerDTO2 data = new PlayerDTO2 { playerName = playerName.Trim(), ownedPokemons = new List<Pokemon>() };
-            foreach (string name in playerTeam.Split(','))
-                if (name.Trim().Length > 0) data.ownedPokemons.Add(new Pokemon { name = name.Trim() });
-            return data;
+            return new PlayerDTO2
+            {
+                playerName = playerName.Trim(),
+                playerRole = playerTeam.Trim()
+            };
         }
 
         void OnClientClosed(string reason)

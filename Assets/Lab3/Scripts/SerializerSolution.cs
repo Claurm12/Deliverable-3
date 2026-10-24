@@ -12,8 +12,7 @@ public static class SerializerSolution
         BinaryWriter writer = new BinaryWriter(stream);
 
         writer.Write(dto.playerName);
-        writer.Write(dto.ownedPokemons.Count);
-        foreach (string pokemon in dto.ownedPokemons) writer.Write(pokemon);
+        writer.Write(dto.playerRole ?? "");
 
         return stream.ToArray();
     }
@@ -22,11 +21,9 @@ public static class SerializerSolution
     {
         BinaryReader reader = new BinaryReader(new MemoryStream(data));
         PlayerDTO dto = new PlayerDTO();
-        dto.ownedPokemons = new List<string>();
 
         dto.playerName = reader.ReadString();
-        int count = reader.ReadInt32();
-        for (int i = 0; i < count; i++) dto.ownedPokemons.Add(reader.ReadString());
+        dto.playerRole = reader.ReadString();
 
         return dto;
     }
@@ -37,8 +34,7 @@ public static class SerializerSolution
         BinaryWriter writer = new BinaryWriter(stream);
 
         writer.Write(dto.playerName);
-        writer.Write(dto.ownedPokemons.Count);//limpiar pokemons por equipos
-        foreach (Pokemon pokemon in dto.ownedPokemons) writer.Write(pokemon.name);
+        writer.Write(dto.playerRole ?? "");
 
         return stream.ToArray();
     }
@@ -47,16 +43,9 @@ public static class SerializerSolution
     {
         BinaryReader reader = new BinaryReader(new MemoryStream(data));
         PlayerDTO2 dto = new PlayerDTO2();
-        dto.ownedPokemons = new List<Pokemon>();//limpiar pokemons por equipos
 
         dto.playerName = reader.ReadString();
-        int count = reader.ReadInt32();
-        for (int i = 0; i < count; i++)
-        {
-            Pokemon pokemon = new Pokemon();
-            pokemon.name = reader.ReadString();
-            dto.ownedPokemons.Add(pokemon);
-        }
+        dto.playerRole = reader.ReadString();
 
         return dto;
     }
