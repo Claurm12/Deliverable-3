@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
@@ -154,7 +154,7 @@ namespace Delivery3
 
             byte[] shootPacket = Messages.Shoot(objectId, pos, dir);
 
-            // Reenvía el disparo para tdos los jugadores
+            // Reenvia el disparo para tdos los jugadores
             foreach (Player p in m_players)
             {
                 Send(p.connection, shootPacket);
@@ -196,6 +196,42 @@ namespace Delivery3
         public void StartGame()
         {
             if (Started) return;
+
+            if (m_players.Count > 0)
+            {
+                int hunterIndex = UnityEngine.Random.Range(0, m_players.Count);
+
+                for (int i = 0; i < m_players.Count; i++)
+                {
+                    Player p = m_players[i];
+
+                    if (p.data.ownedPokemons == null) p.data.ownedPokemons = new List<Pokemon>();
+                    else p.data.ownedPokemons.Clear();
+
+                    int rolDesignado = (i == hunterIndex) ? 0 : 1;
+
+                    switch (rolDesignado)
+                    {
+                        case 0:
+                            p.data.ownedPokemons.Add(new Pokemon { name = "Hunter" });
+                            SendText(p.connection, "Eres el CAZADOR");
+                            break;
+
+                        case 1:
+                            p.data.ownedPokemons.Add(new Pokemon { name = "Chased" });
+                            SendText(p.connection, "Escapa del cazador");
+                            break;
+
+                        default:
+                            p.data.ownedPokemons.Add(new Pokemon { name = "Chased" });
+                            SendText(p.connection, "Eres el CAZADOR");
+                            break;
+                    }
+                }
+
+                SendRoomState();
+            }
+
             Started = true;
             Log("[SERVER] Game started with " + Names(", "));
             Broadcast("START:");

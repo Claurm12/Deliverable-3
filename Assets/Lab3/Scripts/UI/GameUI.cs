@@ -61,11 +61,51 @@ namespace Delivery3
 
             string myName = session.Client.userName;
             m_myObjectId = myName.GetHashCode();
-            // Cubo
+
+            // Cubo local
             m_myPlayerObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             m_myPlayerObject.name = "Player_" + myName;
             float startX = UnityEngine.Random.Range(-3f, 3f);
             m_myPlayerObject.transform.position = new Vector3(startX, 0.5f, 0f);
+
+            ApplyPlayerColor(m_myPlayerObject, myName);
+        }
+
+        // Color segun el rol
+        private void ApplyPlayerColor(GameObject playerObj, string playerName)
+        {
+            if (playerObj == null) return;
+
+            LobbySession session = LobbySession.Instance;
+            string rolActual = "Chased"; 
+            PlayerDTO2 data;
+
+            if (session.Client != null && session.Client.Teams.TryGetValue(playerName, out data))
+            {
+                if (data.ownedPokemons != null && data.ownedPokemons.Count > 0)
+                {
+                    rolActual = data.ownedPokemons[0].name;
+                }
+            }
+
+            Renderer rend = playerObj.GetComponent<Renderer>();
+            if (rend != null)
+            {
+                switch (rolActual)
+                {
+                    case "Hunter":
+                        rend.material.color = Color.red;   // Rojo cazador
+                        break;
+
+                    case "Chased":
+                        rend.material.color = Color.blue;  // Azul los que escapan
+                        break;
+
+                    default:
+                        rend.material.color = Color.gray;
+                        break;
+                }
+            }
         }
 
         void Update()
@@ -88,6 +128,7 @@ namespace Delivery3
 
                 Vector3 direction = new Vector3(h, 0, v);
                 Vector3 currentPos = m_myPlayerObject.transform.position;
+
                 // Gestion del salto
                 if (m_jumpRequested && currentPos.y <= 0.51f)
                 {
@@ -114,7 +155,7 @@ namespace Delivery3
 
                 m_myPlayerObject.transform.position = currentPos;
 
-                // Enviar posicion UDP
+                // Enviar posicion por UDP
                 m_sendTimer += Time.deltaTime;
                 if (m_sendTimer >= 0.05f)
                 {
@@ -235,7 +276,7 @@ namespace Delivery3
             LobbyClient client = session.Client;
 
             LobbyGUI.Begin("GAME  (" + session.protocol + ")   " + client.RoomInfo);
-            GUILayout.Label("Move: W, A, S, D Jump: Space Shoot: F");
+            GUILayout.Label("Move: W, A, S, D  Jump: Space  Shoot: F");
             GUILayout.Label("Players: " + string.Join(", ", client.Players) +
                             "    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
 
@@ -261,8 +302,20 @@ namespace Delivery3
                 GameObject newObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 newObj.name = "Player_Remote_" + objectId;
 
+                string remotePlayerName = "";
+                foreach (string name in LobbySession.Instance.Client.Players)
+                {
+                    if (name.GetHashCode() == objectId)
+                    {
+                        remotePlayerName = name;
+                        break;
+                    }
+                }
+
                 remotePlayer = new RemotePlayer { gameObject = newObj, lastReceiveTime = Time.realtimeSinceStartup };
                 m_remotePlayers[objectId] = remotePlayer;
+
+                ApplyPlayerColor(newObj, remotePlayerName);
             }
 
             remotePlayer.gameObject.transform.position = pos;
