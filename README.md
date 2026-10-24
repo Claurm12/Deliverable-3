@@ -1,8 +1,6 @@
-
 # ***Deliverable-3***
 
-Documentación de la primera interacción del proyecto
-# ***Documentación***
+Documentación de la primera interacción del proyecto# ***Documentación***
 
 ## **Cómo ejecutar el proyecto**
 ### .exe Host
@@ -23,9 +21,16 @@ La primera escena que aparece al ejecutar el programa es la L3_Menu, de ahi va p
     <p align="center"> L3_Game  </p>
 
 ## **Input**
+Se utilizan estos controles porque son los controles de movimiento típicos para juegos de PC.
+### Movimiento
+W y UpArrow -> Mover hacia arriba <br>
+S y DownArrow -> Mover hacia abajo <br>
+A Y LeftArrow -> Mover hacia la izquierda <br>
+D y RightArrow -> Mover hacia la derecha <br>
+Barra espaciadora -> Saltar <br>
 
-Si envieu estat o input, i per què
-
+### Atacar
+F -> Botón para disparar
 ## **Extras**
 
 Els extres que heu fet
@@ -44,6 +49,7 @@ Què ha canviat des de l'entrega 2
 | ------------- | ------------- |
 | *Claudia Ruiz*  | - Creacion Proyecto unity base <br> -   |
 | *Víctor González*  |- Base Readme  <br> -  |## Authors
+## Authors
 
 - ***Cluadia Ruiz*** [@Claurm12](https://www.github.com/Claurm12)
 - ***Víctor González*** [@TheWolfG145](https://www.github.com/TheWolfG145)
