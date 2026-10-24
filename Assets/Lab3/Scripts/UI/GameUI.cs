@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -62,13 +62,28 @@ namespace Delivery3
             string myName = session.Client.userName;
             m_myObjectId = myName.GetHashCode();
 
-            // Cubo local
+            //Cubo local
             m_myPlayerObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             m_myPlayerObject.name = "Player_" + myName;
             float startX = UnityEngine.Random.Range(-3f, 3f);
             m_myPlayerObject.transform.position = new Vector3(startX, 0.5f, 0f);
 
+          
             ApplyPlayerColor(m_myPlayerObject, myName);
+
+           
+            string rolActual = "Chased";
+            PlayerDTO2 data;
+            if (session.Client.Teams.TryGetValue(myName, out data) && !string.IsNullOrEmpty(data.playerRole))
+            {
+                rolActual = data.playerRole;
+            }
+
+            string mensajeRol = (rolActual == "Hunter")
+                ? "Eres el CAZADOR"
+                : "ESCAPA del cazador";
+
+            session.Client.Chat.Add(mensajeRol);
         }
 
         // Color segun el rol
