@@ -3,7 +3,15 @@
   "WorkspaceRootPath": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\gameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\network\\lobbyclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\lobbyclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\network\\udplobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\udplobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|b:\\clase\\4rt\\xarxas\\entrega_sockets\\deliverable-3\\assets\\lab3\\scripts\\ui\\gameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\gameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -19,10 +27,6 @@
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\udplobbyclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\network\\udplobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\udplobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\waitingroomui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\waitingroomui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -31,12 +35,8 @@
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\joingameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|b:\\clase\\4rt\\xarxas\\entrega_sockets\\deliverable-3\\assets\\lab3\\scripts\\ui\\creategameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\creategameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\creategameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\network\\lobbyclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\lobbyclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\menuui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -58,7 +58,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 11,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -82,7 +82,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 0,
               "Title": "LobbyClient.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\LobbyClient.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Network\\LobbyClient.cs",
@@ -107,7 +107,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "LobbySession.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\LobbySession.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\LobbySession.cs",
@@ -115,12 +115,11 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\LobbySession.cs",
               "ViewState": "AgIAAEIAAAAAAAAAAAAkwHQAAABWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-21T08:31:15.319Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-21T08:31:15.319Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "CreateGameUI.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\CreateGameUI.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\CreateGameUI.cs",
@@ -128,12 +127,11 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\CreateGameUI.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-21T08:51:20.974Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-21T08:51:20.974Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "JoinGameUI.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\JoinGameUI.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\JoinGameUI.cs",
@@ -141,12 +139,11 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\JoinGameUI.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-21T09:26:34.806Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-21T09:26:34.806Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "WaitingRoomUI.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
@@ -154,12 +151,11 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
               "ViewState": "AgIAACQAAAAAAAAAAAA5wBEAAABzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-21T08:47:17.001Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-21T08:47:17.001Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "UDPLobbyServer.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\UDPLobbyServer.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Network\\UDPLobbyServer.cs",
@@ -172,7 +168,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "UDPLobbyClient.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\UDPLobbyClient.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Network\\UDPLobbyClient.cs",
@@ -180,12 +176,11 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\Network\\UDPLobbyClient.cs",
               "ViewState": "AgIAADYAAAAAAAAAAAAowBkAAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-21T10:26:14.141Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-21T10:26:14.141Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "GameUI.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\GameUI.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\GameUI.cs",
@@ -210,7 +205,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "PlayerDTO.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\PlayerDTO.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\PlayerDTO.cs",
@@ -218,8 +213,7 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\PlayerDTO.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-21T08:31:44.781Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-21T08:31:44.781Z"
             }
           ]
         }
