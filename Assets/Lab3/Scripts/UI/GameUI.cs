@@ -106,21 +106,42 @@ namespace Delivery3
             Renderer rend = playerObj.GetComponent<Renderer>();
             if (rend != null)
             {
+                UnityEngine.Color targetColor;
                 switch (rolActual)
                 {
                     case "Hunter":
-                        rend.material.color = Color.red;   // Rojo cazador
+                        targetColor = UnityEngine.Color.red;   // Rojo cazador
                         break;
 
                     case "Chased":
-                        rend.material.color = Color.blue;  // Azul los que escapan
+                        targetColor = UnityEngine.Color.blue; // Azul los que escapan
                         break;
 
                     default:
-                        rend.material.color = Color.gray;
+                        targetColor = UnityEngine.Color.gray;
                         break;
                 }
+                rend.material = CreatePrimitiveMaterial(targetColor);
             }
+        }
+
+        private Material CreatePrimitiveMaterial(UnityEngine.Color baseColor)
+        {
+            Material baseMat = Resources.Load<Material>("MaterialJugadores");
+
+            Material mat = (baseMat != null) ? new Material(baseMat) : new Material(Shader.Find("Universal Render Pipeline/Lit"));
+
+
+            if (mat.HasProperty("_BaseColor"))
+            {
+                mat.SetColor("_BaseColor", baseColor);
+            }
+            else
+            {
+                mat.color = baseColor;
+            }
+
+            return mat;
         }
 
         void Update()
@@ -256,6 +277,11 @@ namespace Delivery3
             bullet.transform.position = pos;
             bullet.transform.localScale = Vector3.one * 0.4f;
             bullet.AddComponent<BulletMover>();
+            Renderer rend = bullet.GetComponent<Renderer>();
+            if (rend != null)
+            {
+                rend.material = CreatePrimitiveMaterial(UnityEngine.Color.yellow);
+            }
         }
 
         void OnGUI()
@@ -290,10 +316,10 @@ namespace Delivery3
             LobbySession session = LobbySession.Instance;
             LobbyClient client = session.Client;
 
-            LobbyGUI.Begin("GAME  (" + session.protocol + ")   " + client.RoomInfo);
-            GUILayout.Label("Move: W, A, S, D  Jump: Space  Shoot: F");
-            GUILayout.Label("Players: " + string.Join(", ", client.Players) +
-                            "    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
+            LobbyGUI.Begin("<color=black>GAME  (" + session.protocol + ")   " + client.RoomInfo);
+            GUILayout.Label("<color=black>Move: W, A, S, D  Jump: Space  Shoot: F");
+            GUILayout.Label("<color=black>Players: " + string.Join(", ", client.Players) +
+                            "<color=black>    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
 
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical(GUILayout.Width(400));

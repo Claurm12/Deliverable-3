@@ -13,7 +13,7 @@ namespace Delivery3
         void OnGUI()
         {
             LobbySession session = LobbySession.Instance;
-            LobbyGUI.Begin("XJO LOBBY  -  Lab 3 solution");
+            LobbyGUI.Begin("GAME LOBBY  -  Lab 3");
 
             session.playerName = LobbyGUI.Field("Your name", session.playerName);
 
