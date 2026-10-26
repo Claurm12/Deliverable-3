@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace Delivery3
 {
-    public enum LobbyProtocol { UDP }
+    public enum LobbyProtocol { TCP, UDP }
 
     public class LobbySession : MonoBehaviour
     {
@@ -59,7 +59,9 @@ namespace Delivery3
         public bool Host(string serverName, int port, int maxPlayers)
         {
             EndSession();
-            Server = gameObject.AddComponent<UDPLobbyServer>();
+            Server = protocol == LobbyProtocol.UDP
+             ? (LobbyServer)gameObject.AddComponent<TCPLobbyServer>()
+             : gameObject.AddComponent<UDPLobbyServer>();
             Server.serverName = serverName;
             Server.port = port;
             Server.maxPlayers = maxPlayers;
@@ -80,7 +82,9 @@ namespace Delivery3
             if (Client != null) { Destroy(Client); Client = null; }
             message = "";
 
-            Client = gameObject.AddComponent<UDPLobbyClient>();
+            Client = protocol == LobbyProtocol.UDP
+                 ? (LobbyClient)gameObject.AddComponent<TCPLobbyClient>()
+                 : gameObject.AddComponent<UDPLobbyClient>();
             Client.serverIp = ip.Trim();
             Client.port = port;
             Client.myData = MakePlayerData();
@@ -124,7 +128,7 @@ namespace Delivery3
                 if (args[i].StartsWith("-") && i + 1 < args.Length && !args[i + 1].StartsWith("-"))
                     m_args[args[i].Substring(1)] = args[++i];
 
-            protocol = LobbyProtocol.UDP;
+            if (m_args.ContainsKey("proto")) protocol = m_args["proto"] == "udp" ? LobbyProtocol.UDP : LobbyProtocol.TCP;
             if (m_args.ContainsKey("name")) playerName = m_args["name"];
             if (m_args.ContainsKey("team")) playerTeam = m_args["team"] == "none" ? "" : m_args["team"];
         }
