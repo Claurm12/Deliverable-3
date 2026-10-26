@@ -30,8 +30,9 @@ Barra espaciadora -> Saltar <br>
 ### Atacar
 F -> Botón para disparar
 ## **Extras**
-
-Els extres que heu fet
+* El jugador puede saltar
+* Aparecen los equipos y se asignan los roles de equipo de manera aleatoria
+* El jugador puede disparar
 
 ## **Bugs Conocidos**
 
@@ -40,11 +41,11 @@ Els bugs coneguts. Un bug que ja apunteu resta menys que un que trobem nosaltres
 
 ## **Cambios de la anterior entrega**
 
-* Cliente y servidor solo de UDP, ya no hay TCP.
-* Pasamos de tener todo en una escena a tener una escena para el menu principal, otra para crear sala, otra para unirse a sala, una para la witing room y otra para el juego.
-* Cliente y servidor estan en el mismo ejecutable en vez de 2 diferentes.
-* Al unirse al juego se da de manera aleatoria los roles de Cazador y Cazado, y se asigna su color a cada jugador.
-* Pantalla de juego añadida, con pj para cada jugador en el servidor. y una leyenda con los controles en pantalla.
+* El juego va solo por UDP y el chat puede ir por TCP.
+* Pasamos de tener todo en una escena a tener una escena para el menú principal, otra para crear sala, otra para unirse a sala, una para la waiting room y otra para el juego.
+* Cliente y servidor están en el mismo ejecutable en vez de 2 diferentes.
+* Al unirse al juego, se asignan de manera aleatoria los roles de Cazador y Cazado, y se asigna su color a cada jugador.
+* Pantalla de juego añadida, con pj para cada jugador en el servidor. Y una leyenda con los controles en pantalla.
 
 ## **Contribución de cada miembro del equipo**
 | **Miembro** | **Tareas realizadas** | 
