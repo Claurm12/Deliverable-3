@@ -34,11 +34,6 @@ F -> Botón para disparar
 * Aparecen los equipos y se asignan los roles de equipo de manera aleatoria
 * El jugador puede disparar
 
-## **Bugs Conocidos**
-
-Els bugs coneguts. Un bug que ja apunteu resta menys que un que trobem nosaltres
-
-
 ## **Cambios de la anterior entrega**
 
 * El juego va solo por UDP y el chat puede ir por TCP.
