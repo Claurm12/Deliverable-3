@@ -198,13 +198,13 @@ namespace Delivery3
                     m_sendTimer = 0f;
                     byte[] packet = Messages.Transform(m_myObjectId, m_myPlayerObject.transform.position);
 
-                    if (session.IsHost && session.Server is UDPLobbyServer udpServer)
+                    if (session.IsHost)
                     {
-                        udpServer.BroadcastCustomBytes(packet);
+                        session.Server.BroadcastCustomBytes(packet);
                     }
-                    else if (!session.IsHost && client is UDPLobbyClient udpClient)
+                    else
                     {
-                        udpClient.SendCustomBytes(packet);
+                        client.SendCustomBytes(packet);
                     }
                 }
 
@@ -261,13 +261,13 @@ namespace Delivery3
             CreateBulletGameObject(pos, dir);
 
             byte[] packet = Messages.Shoot(objectId, pos, dir);
-            if (session.IsHost && session.Server is UDPLobbyServer udpServer)
+            if (session.IsHost)
             {
-                udpServer.BroadcastCustomBytes(packet);
+                session.Server.BroadcastCustomBytes(packet);
             }
-            else if (!session.IsHost && client is UDPLobbyClient udpClient)
+            else
             {
-                udpClient.SendCustomBytes(packet);
+                client.SendCustomBytes(packet);
             }
         }
 

@@ -196,5 +196,10 @@ namespace Delivery3
         }
 
         protected void Log(string message) { LobbySession.Log(message); }
+
+        public virtual void SendCustomBytes(byte[] payload)
+        {
+            SendBytes(payload);
+        }
     }
 }

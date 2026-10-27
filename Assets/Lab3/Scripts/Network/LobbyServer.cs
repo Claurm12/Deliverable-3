@@ -277,5 +277,13 @@ namespace Delivery3
         protected void ClearPlayers() { m_players.Clear(); Started = false; }
 
         protected void Log(string message) { LobbySession.Log(message); }
+
+        public virtual void BroadcastCustomBytes(byte[] payload)
+        {
+            foreach (Player p in m_players)
+            {
+                Send(p.connection, payload);
+            }
+        }
     }
 }
