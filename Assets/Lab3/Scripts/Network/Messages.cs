@@ -97,7 +97,7 @@ namespace Delivery3
 
         public static string Describe(PlayerDTO2 dto)
         {
-            return !string.IsNullOrEmpty(dto.playerRole) ? dto.playerRole : "Chased";
+            return !string.IsNullOrEmpty(dto.playerRole) ? dto.playerRole : "";
         }
 
         public static byte[] Transform(int objectId, Vector3 pos)

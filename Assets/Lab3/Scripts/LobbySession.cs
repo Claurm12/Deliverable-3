@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace Delivery3
 {
-    public enum LobbyProtocol { TCP, UDP }
+    public enum LobbyProtocol { UDP }
 
     public class LobbySession : MonoBehaviour
     {
@@ -18,7 +18,7 @@ namespace Delivery3
 
         public LobbyProtocol protocol = LobbyProtocol.UDP;
         public string playerName = "Player";
-        public string playerTeam = "Hunter, Chased";   // comma separated, as typed in the menu
+       // public string playerTeam = "Hunter, Chased";   // comma separated, as typed in the menu
         public string message = "";            // why the last session ended, shown in the menu
 
         public LobbyServer Server { get; private set; }
@@ -59,9 +59,10 @@ namespace Delivery3
         public bool Host(string serverName, int port, int maxPlayers)
         {
             EndSession();
-            Server = protocol == LobbyProtocol.UDP
-             ? (LobbyServer)gameObject.AddComponent<TCPLobbyServer>()
-             : gameObject.AddComponent<UDPLobbyServer>();
+            Server = gameObject.AddComponent<UDPLobbyServer>();
+            //Server = protocol == LobbyProtocol.UDP
+            // ? (LobbyServer)gameObject.AddComponent<TCPLobbyServer>()
+            // : gameObject.AddComponent<UDPLobbyServer>();
             Server.serverName = serverName;
             Server.port = port;
             Server.maxPlayers = maxPlayers;
@@ -81,10 +82,10 @@ namespace Delivery3
         {
             if (Client != null) { Destroy(Client); Client = null; }
             message = "";
-
-            Client = protocol == LobbyProtocol.UDP
-                 ? (LobbyClient)gameObject.AddComponent<TCPLobbyClient>()
-                 : gameObject.AddComponent<UDPLobbyClient>();
+            Client = gameObject.AddComponent<UDPLobbyClient>();
+            //Client = protocol == LobbyProtocol.UDP
+            //     ? (LobbyClient)gameObject.AddComponent<TCPLobbyClient>()
+            //     : gameObject.AddComponent<UDPLobbyClient>();
             Client.serverIp = ip.Trim();
             Client.port = port;
             Client.myData = MakePlayerData();
@@ -100,8 +101,8 @@ namespace Delivery3
         {
             return new PlayerDTO2
             {
-                playerName = playerName.Trim(),
-                playerRole = playerTeam.Trim()
+               playerName = playerName.Trim(),
+              // playerRole = playerTeam.Trim()
             };
         }
 
@@ -127,10 +128,10 @@ namespace Delivery3
             for (int i = 1; i < args.Length; i++)
                 if (args[i].StartsWith("-") && i + 1 < args.Length && !args[i + 1].StartsWith("-"))
                     m_args[args[i].Substring(1)] = args[++i];
-
-            if (m_args.ContainsKey("proto")) protocol = m_args["proto"] == "udp" ? LobbyProtocol.UDP : LobbyProtocol.TCP;
+            protocol = LobbyProtocol.UDP;
+            // if (m_args.ContainsKey("proto")) protocol = m_args["proto"] == "udp" ? LobbyProtocol.UDP : LobbyProtocol.TCP;
             if (m_args.ContainsKey("name")) playerName = m_args["name"];
-            if (m_args.ContainsKey("team")) playerTeam = m_args["team"] == "none" ? "" : m_args["team"];
+            //if (m_args.ContainsKey("team")) playerTeam = m_args["team"] == "none" ? "" : m_args["team"];
         }
 
         float Arg(string key) { return m_args.ContainsKey(key) ? float.Parse(m_args[key]) : -1f; }

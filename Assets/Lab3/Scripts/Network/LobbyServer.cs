@@ -113,12 +113,12 @@ namespace Delivery3
             if (name.Length == 0) name = "Player";
             dto.playerName = name;
 
-            if (string.IsNullOrEmpty(dto.playerRole)) dto.playerRole = "Chased";
+            //if (string.IsNullOrEmpty(dto.playerRole)) dto.playerRole = "Chased";
 
             if (player != null)
             {
                 if (dto.playerName != player.name) { SendRoomStateTo(from); return; }
-                if (Messages.Describe(dto) == Messages.Describe(player.data)) { SendRoomStateTo(from); return; }
+                //if (Messages.Describe(dto) == Messages.Describe(player.data)) { SendRoomStateTo(from); return; }
                 player.data = dto;
                 SendRoomState();
                 return;
