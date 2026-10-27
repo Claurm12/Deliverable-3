@@ -51,8 +51,8 @@ Se mantiene el lag bajo pasando todas las acciones del juego por udp, mientras q
 ## **Contribución de cada miembro del equipo**
 | **Miembro** | **Tareas realizadas** | 
 | ------------- | ------------- |
-| *Claudia Ruiz*  | - Creacion Proyecto unity base <br> -   |
-| *Víctor González*  |- Base Readme  <br> -  |
+| *Claudia Ruiz* | - Creación Proyecto Unity base <br> - Aparecen todos los jugadores <br> - Borrar jugador <br> - Movimiento jugador <br> - Asignación de roles <br> - Asignación colores por rol a los jugadores|
+| *Víctor González* |- Creación Proyecto Unity base <br>- Readme <br> - Jugador no se mueve mientras se usa el chat <br> - El jugador salta <br> - El jugador dispara <br> - Limpieza de código <br> - Limpieza Ui <br> - Arreglo bug textura colores jugadores|
 
 ## **Authors**
 
