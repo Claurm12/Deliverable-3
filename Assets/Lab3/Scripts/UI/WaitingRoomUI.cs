@@ -50,7 +50,7 @@ namespace Delivery3
                 GUILayout.EndHorizontal();
 
                 PlayerDTO2 data;
-                GUILayout.Label("    " + (client.Teams.TryGetValue(name, out data) ? Messages.Describe(data) : "..."));
+                //GUILayout.Label("    " + (client.Teams.TryGetValue(name, out data) ? Messages.Describe(data) : "...")); linea sobra
 
                 if (kick)
                 {

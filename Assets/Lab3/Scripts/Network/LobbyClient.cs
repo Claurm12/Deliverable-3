@@ -123,9 +123,9 @@ namespace Delivery3
         void OnPlayerData(PlayerDTO2 dto)
         {
             PlayerDTO2 old;
-            bool changed = !Teams.TryGetValue(dto.playerName, out old) || Messages.Describe(old) != Messages.Describe(dto);
+            bool changed = !Teams.TryGetValue(dto.playerName, out old);
             Teams[dto.playerName] = dto;
-            if (changed) Log("[CLIENT " + userName + "] Data of " + dto.playerName + ": " + Messages.Describe(dto));
+            if (changed) Log("[CLIENT " + userName + "] Data of " + dto.playerName + ": ");
         }
 
         void OnText(string text)

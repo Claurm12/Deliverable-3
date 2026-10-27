@@ -95,11 +95,7 @@ namespace Delivery3
             return type;
         }
 
-        public static string Describe(PlayerDTO2 dto)
-        {
-            return !string.IsNullOrEmpty(dto.playerRole) ? dto.playerRole : "";
-        }
-
+     
         public static byte[] Transform(int objectId, Vector3 pos)
         {
             byte[] body = SerializerSolution.SerializeTransform(objectId, pos);

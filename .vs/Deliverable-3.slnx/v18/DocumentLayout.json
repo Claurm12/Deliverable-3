@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\LobbySession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Lab3\\Scripts\\LobbySession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\victorga4\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\network\\messages.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\messages.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\victorga4\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\network\\lobbyclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\lobbyclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\victorga4\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\ui\\waitingroomui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\waitingroomui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\Messages.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Lab3\\Scripts\\Network\\Messages.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\victorga4\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\lobbysession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\lobbysession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\victorga4\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\network\\lobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -38,43 +38,31 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "Messages.cs",
-              "DocumentMoniker": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\Messages.cs",
-              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Network\\Messages.cs",
-              "ToolTip": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\Messages.cs",
-              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Network\\Messages.cs",
-              "ViewState": "AgIAAFUAAAAAAAAAAAAkwGEAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-27T10:24:42.454Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "WaitingRoomUI.cs",
               "DocumentMoniker": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
               "ToolTip": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAAQAAAAAAAAAA==",
+              "ViewState": "AgIAACEAAAAAAAAAAAAAwDQAAACFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-27T10:07:11.143Z",
+              "IsPinned": true,
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "LobbyClient.cs",
               "DocumentMoniker": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\LobbyClient.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Network\\LobbyClient.cs",
               "ToolTip": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\LobbyClient.cs",
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\Network\\LobbyClient.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAH8AAAB0AAAAAAAAAA==",
+              "ViewState": "AgIAAHAAAAAAAAAAAAAgwH8AAABbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-27T10:05:42.066Z",
               "EditorCaption": ""
@@ -89,8 +77,7 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
               "ViewState": "AgIAAGgAAAAAAAAAAAAAwHgAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-27T10:05:19.836Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-27T10:05:19.836Z"
             },
             {
               "$type": "Document",
@@ -118,15 +105,28 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "LobbySession.cs",
               "DocumentMoniker": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\LobbySession.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\LobbySession.cs",
               "ToolTip": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\LobbySession.cs",
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\LobbySession.cs",
-              "ViewState": "AgIAAHkAAAAAAAAAAAAqwIUAAAAOAAAAAAAAAA==",
+              "ViewState": "AgIAAGwAAAAAAAAAAAAywIUAAABqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-27T10:21:53.208Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Messages.cs",
+              "DocumentMoniker": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\Messages.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Network\\Messages.cs",
+              "ToolTip": "C:\\Users\\victorga4\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\Messages.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Network\\Messages.cs",
+              "ViewState": "AgIAAFgAAAAAAAAAAAAQwGEAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-27T10:33:31.714Z",
               "EditorCaption": ""
             }
           ]
