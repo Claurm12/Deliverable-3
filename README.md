@@ -31,16 +31,22 @@ Barra espaciadora -> Saltar <br>
 F -> Botón para disparar
 ## **Extras**
 * El jugador puede saltar
-* Aparecen los equipos y se asignan los roles de equipo de manera aleatoria
+* Al iniciar la partida se asignan los roles de equipo de manera aleatoria.
 * El jugador puede disparar
+* Más de 2 jugadores
 
 ## **Cambios de la anterior entrega**
 
-* El juego va solo por UDP y el chat puede ir por TCP.
+* Los datos del juego van por UDP.
 * Pasamos de tener todo en una escena a tener una escena para el menú principal, otra para crear sala, otra para unirse a sala, una para la waiting room y otra para el juego.
 * Cliente y servidor están en el mismo ejecutable en vez de 2 diferentes.
 * Al unirse al juego, se asignan de manera aleatoria los roles de Cazador y Cazado, y se asigna su color a cada jugador.
-* Pantalla de juego añadida, con pj para cada jugador en el servidor. Y una leyenda con los controles en pantalla.
+* Escena de juego añadida, con pj para cada jugador en el servidor. Y una leyenda con los controles en pantalla.
+* La serializacion esta implementada en su propio script.
+* La UI de cada escena tiene su propio codigo.
+
+## **Explicación latencia y mensajes**
+Se mantiene el lag bajo pasando todas las acciones del juego por udp, mientras que los chats pasaran por tcp. De esa manera se mantiene bajo y podemos asegurarnos de que los mensajes siempre lleguen a todos los jugadores.
 
 ## **Contribución de cada miembro del equipo**
 | **Miembro** | **Tareas realizadas** | 
