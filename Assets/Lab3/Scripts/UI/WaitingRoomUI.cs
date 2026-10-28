@@ -37,8 +37,7 @@ namespace Delivery3
         static void DrawPlayers(LobbySession session, LobbyClient client)
         {
             GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(460), GUILayout.Height(Screen.height - 200));
-            GUILayout.Label("Players (" + client.Players.Count +
-                            (session.IsHost ? "/" + session.Server.maxPlayers : "") + ")");
+            GUILayout.Label("Players (" + client.Players.Count + (session.IsHost ? "/" + session.Server.maxPlayers : "") + ")");
             foreach (string name in client.Players)
             {
                 GUILayout.BeginHorizontal();
@@ -50,7 +49,7 @@ namespace Delivery3
                 GUILayout.EndHorizontal();
 
                 PlayerDTO2 data;
-                //GUILayout.Label("    " + (client.Teams.TryGetValue(name, out data) ? Messages.Describe(data) : "...")); linea sobra
+                
 
                 if (kick)
                 {

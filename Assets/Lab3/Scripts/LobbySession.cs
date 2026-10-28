@@ -18,7 +18,6 @@ namespace Delivery3
 
         public LobbyProtocol protocol = LobbyProtocol.UDP;
         public string playerName = "Player";
-       // public string playerTeam = "Hunter, Chased";   // comma separated, as typed in the menu
         public string message = "";            // why the last session ended, shown in the menu
 
         public LobbyServer Server { get; private set; }
@@ -102,7 +101,6 @@ namespace Delivery3
             return new PlayerDTO2
             {
                playerName = playerName.Trim(),
-              // playerRole = playerTeam.Trim()
             };
         }
 

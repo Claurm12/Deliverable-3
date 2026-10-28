@@ -317,7 +317,7 @@ namespace Delivery3
             LobbyClient client = session.Client;
 
             LobbyGUI.Begin("<color=black>GAME  (" + session.protocol + ")   " + client.RoomInfo);
-            GUILayout.Label("<color=black>Move: W, A, S, D  Jump: Space  Shoot: F");
+            GUILayout.Label("<color=black>Move: forward: W / ↑ Left: A / ← Backward: S / ↓ Right: D / →  Jump: Space  Shoot: F");
             GUILayout.Label("<color=black>Players: " + string.Join(", ", client.Players) +
                             "<color=black>    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
 

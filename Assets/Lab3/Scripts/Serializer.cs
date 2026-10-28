@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-public static class SerializerSolution
+public static class Serializer
 {
     public static byte[] Serialize(PlayerDTO dto)
     {

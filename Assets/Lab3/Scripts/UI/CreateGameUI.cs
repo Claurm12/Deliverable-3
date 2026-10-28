@@ -7,7 +7,7 @@ namespace Delivery3
     {
         string m_roomName = "MyRoom";
         string m_port = "9050";
-        string m_ip = "9050";//mostrar ip propia por pantalla
+        string m_ip = "";//mostrar ip propia por pantalla falta implementar
         int m_maxPlayers = 4;
         bool m_creating;
 
@@ -36,7 +36,7 @@ namespace Delivery3
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
-            GUILayout.Label("Others join with your IP (ipconfig): " + m_ip + " and port " + m_port);
+            GUILayout.Label("Others join with your IP (ipconfig) and port " + m_port);
             LobbyGUI.Message(session.message);
             LobbyGUI.End();
         }
