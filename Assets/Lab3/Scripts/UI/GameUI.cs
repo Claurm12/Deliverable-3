@@ -209,13 +209,30 @@ namespace Delivery3
                 }
 
                 //Disparar
+                // Disparar (Solo permitido si eres el Cazador)
                 if (m_shootRequested)
                 {
                     m_shootRequested = false;
-                    Vector3 spawnPos = m_myPlayerObject.transform.position + Vector3.forward * 0.8f;
-                    Vector3 shootDir = Vector3.forward;
 
-                    SpawnAndSendBullet(session, client, m_myObjectId, spawnPos, shootDir);
+                    string myName = client.userName;
+                    string currentRole = "Chased";
+                    PlayerDTO2 data;
+                    if (client.Teams.TryGetValue(myName, out data) && !string.IsNullOrEmpty(data.playerRole))
+                    {
+                        currentRole = data.playerRole;
+                    }
+
+                    if (currentRole == "Hunter")
+                    {
+                        Vector3 spawnPos = m_myPlayerObject.transform.position + Vector3.forward * 0.8f;
+                        Vector3 shootDir = Vector3.forward;
+
+                        SpawnAndSendBullet(session, client, m_myObjectId, spawnPos, shootDir);
+                    }
+                    else
+                    {
+                        Debug.Log("No puedes disparar porque eres el que escapa.");
+                    }
                 }
             }
 
