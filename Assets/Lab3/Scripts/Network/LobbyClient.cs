@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace Delivery3
@@ -9,7 +10,7 @@ namespace Delivery3
     {
         public string serverIp = "127.0.0.1";
         public int port = 9050;
-        public PlayerDTO2 myData;              // sent when joining. myData.playerName is our name
+        public PlayerDTO2 myData;
         public float pingSeconds = 1f;
 
         public string userName { get { return myData.playerName; } }
@@ -21,33 +22,31 @@ namespace Delivery3
         public int PingMs = -1;
         public bool InRoom { get; private set; }
 
-        public event Action Joined;            // first player list received: we are in
-        public event Action GameStarted;       // the host pressed Start
-        public event Action<string> Closed;    // why we are out: left, kicked, refused, lost
+        public event Action Joined;
+        public event Action GameStarted;
+        public event Action<string> Closed;
 
-        // Network thread to main thread. null means "the connection ended" (see m_endReason).
         protected readonly ConcurrentQueue<byte[]> m_inbox = new ConcurrentQueue<byte[]>();
         protected volatile string m_endReason = "Connection to the server lost";
-        protected float m_lastHeard;           // last time anything arrived from the server
+        protected float m_lastHeard;
         float m_lastPing;
         bool m_closed;
 
+        // Gestores de Replicación para el Cliente (Delivery 4)
+        protected ReplicationManagerClient m_replicationClient;
+        protected LinkingContext m_linkingContext;
+        [Header("Prefabs de Red (0: Jugador, 1: Bala, etc.)")]
+        public GameObject[] networkPrefabs; // Asigna esto o configúralo
 
         public event Action<int, Vector3> TransformReceived;
         public event Action<int, Vector3, Vector3> ShootReceived;
-
-        // ------------------------------------------------------------------ what TCP and UDP provide
 
         public abstract void Connect();
         protected abstract void SendBytes(byte[] message);
         protected abstract void CloseSocket();
 
         protected void SendText(string text) { SendBytes(Messages.Text(text)); }
-
-        // 2.2 sent JOIN:<name>. Now joining is our whole PlayerDTO2.
         protected byte[] JoinMessage() { return Messages.Player(myData); }
-
-        // ------------------------------------------------------------------------ buttons and UI
 
         public void SendChat(string line)
         {
@@ -68,7 +67,18 @@ namespace Delivery3
             Close("You left the room");
         }
 
-        // ----------------------------------------------------------------------------- main thread
+        protected virtual void Awake()
+        {
+            // Inicializar automáticamente los componentes de replicación en el cliente
+            m_linkingContext = gameObject.GetComponent<LinkingContext>();
+            if (m_linkingContext == null) m_linkingContext = gameObject.AddComponent<LinkingContext>();
+
+            m_replicationClient = gameObject.GetComponent<ReplicationManagerClient>();
+            if (m_replicationClient == null) m_replicationClient = gameObject.AddComponent<ReplicationManagerClient>();
+
+            // Si tienes una lista de prefabs asignada, se la pasamos al gestor
+            m_replicationClient.Init(m_linkingContext, networkPrefabs);
+        }
 
         protected virtual void Update()
         {
@@ -77,6 +87,20 @@ namespace Delivery3
             {
                 if (data == null) { Close(m_endReason); break; }
                 m_lastHeard = Time.realtimeSinceStartup;
+
+                // Si el mensaje recibido es un paquete de replicación del estado del mundo (Delivery 4)
+                if (data.Length > 0 && (MsgType)data[0] == MsgType.Replication)
+                {
+                    if (m_replicationClient != null)
+                    {
+                        using (BinaryReader reader = new BinaryReader(new MemoryStream(data, 1, data.Length - 1)))
+                        {
+                            // Le pasamos el lector y nuestro propio ID para evitar el stuttering local[cite: 29, 34]
+                            m_replicationClient.ReadPacket(reader, userName.GetHashCode());
+                        }
+                    }
+                    continue;
+                }
 
                 string text;
                 PlayerDTO2 dto;
@@ -91,7 +115,7 @@ namespace Delivery3
                 }
                 catch (Exception e)
                 {
-                    Log("[CLIENT " + userName + "] Dropped a bad message: " + e.Message);
+                    Log("[CLIENT " + userName + "] Paquete corrupto descartado: " + e.Message);
                     continue;
                 }
 
@@ -125,7 +149,7 @@ namespace Delivery3
             PlayerDTO2 old;
             bool changed = !Teams.TryGetValue(dto.playerName, out old);
             Teams[dto.playerName] = dto;
-            if (changed) Log("[CLIENT " + userName + "] Data of " + dto.playerName + ": ");
+            if (changed) Log("[CLIENT " + userName + "] Datos de " + dto.playerName);
         }
 
         void OnText(string text)
@@ -139,10 +163,9 @@ namespace Delivery3
                 case "PLAYERS":
                     Players.Clear();
                     if (content.Length > 0) Players.AddRange(content.Split(','));
-                    // Forget the data of players who are gone.
                     foreach (string name in new List<string>(Teams.Keys))
                         if (!Players.Contains(name)) Teams.Remove(name);
-                    Log("[CLIENT " + userName + "] Players (" + Players.Count + "): " + string.Join(", ", Players));
+                    Log("[CLIENT " + userName + "] Jugadores (" + Players.Count + "): " + string.Join(", ", Players));
                     if (!InRoom) { InRoom = true; if (Joined != null) Joined(); }
                     break;
 
@@ -162,12 +185,12 @@ namespace Delivery3
                     break;
 
                 case "START":
-                    Log("[CLIENT " + userName + "] The host started the game");
+                    Log("[CLIENT " + userName + "] El host ha iniciado el juego");
                     if (GameStarted != null) GameStarted();
                     break;
 
                 case "KICKED":
-                    Close("The host kicked you out of the room");
+                    Close("El host te ha expulsado de la sala");
                     break;
 
                 case "ERROR":
@@ -182,7 +205,7 @@ namespace Delivery3
             m_closed = true;
             InRoom = false;
             CloseSocket();
-            Log("[CLIENT " + userName + "] Closed: " + reason);
+            Log("[CLIENT " + userName + "] Cerrado: " + reason);
             if (Closed != null) Closed(reason);
         }
 

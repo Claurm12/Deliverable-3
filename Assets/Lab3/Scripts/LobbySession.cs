@@ -20,6 +20,9 @@ namespace Delivery3
         public string playerName = "Player";
         public string message = "";            // why the last session ended, shown in the menu
 
+        [Header("Network Prefabs (Delivery 4)")]
+        public GameObject[] networkPrefabs;    // Lista de prefabs sincronizados (0: Jugador, 1: Bala, etc.)
+
         public LobbyServer Server { get; private set; }
         public LobbyClient Client { get; private set; }
         public bool IsHost { get { return Server != null; } }
@@ -90,6 +93,8 @@ namespace Delivery3
             Client.port = port;
             Client.myData = MakePlayerData();
 
+            Client.networkPrefabs = networkPrefabs;
+
             Client.Joined += delegate { SceneManager.LoadScene(RoomScene); };
             Client.GameStarted += delegate { SceneManager.LoadScene(GameScene); };
             Client.Closed += OnClientClosed;
@@ -100,7 +105,7 @@ namespace Delivery3
         {
             return new PlayerDTO2
             {
-               playerName = playerName.Trim(),
+                playerName = playerName.Trim(),
             };
         }
 

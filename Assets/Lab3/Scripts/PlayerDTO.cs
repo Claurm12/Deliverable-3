@@ -20,5 +20,6 @@ public enum MsgType : byte
     Text = 1,
     Player = 2,
     Transform = 3,
-    Shoot = 4
+    Shoot = 4,
+    Replication = 5
 }

@@ -13,34 +13,56 @@ namespace Delivery3
 
         public class Player
         {
-            public object connection;   // a Socket in TCP, an EndPoint in UDP
-            public PlayerDTO2 data;     // what the client sent when joining
-            public int pingMs = -1;     // reported by the client in every PING
-            public float lastSeen;      // last time anything arrived from it (UDP timeout)
+            public object connection;
+            public PlayerDTO2 data;
+            public int pingMs = -1;
+            public float lastSeen;
             public string name { get { return data.playerName; } }
         }
 
-        // Network thread to main thread. data == null means "this connection is gone" (TCP only).
         protected struct NetEvent { public object from; public byte[] data; }
         protected readonly ConcurrentQueue<NetEvent> m_inbox = new ConcurrentQueue<NetEvent>();
 
-        readonly List<Player> m_players = new List<Player>();   // main thread only
+        readonly List<Player> m_players = new List<Player>();
 
         public IList<Player> Players { get { return m_players.AsReadOnly(); } }
         public bool Started { get; private set; }
         public abstract bool IsRunning { get; }
 
-        // ------------------------------------------------------------------ what TCP and UDP provide
+        // Gestores para la replicación del mundo (Delivery 4)
+        protected ReplicationManagerServer m_replicationServer;
+        protected LinkingContext m_linkingContext;
+        private float m_tickTimer;
+        private const float ServerTickRate = 0.05f; // 20 ticks por segundo
 
-        public abstract bool StartServer();                         // false if the port is taken
+        // ------------------------------------------------------------------ 
+
+        public virtual bool StartServer()
+        {
+            m_linkingContext = gameObject.GetComponent<LinkingContext>();
+            if (m_linkingContext == null)
+            {
+                m_linkingContext = gameObject.AddComponent<LinkingContext>();
+            }
+
+            m_replicationServer = gameObject.GetComponent<ReplicationManagerServer>();
+            if (m_replicationServer == null)
+            {
+                m_replicationServer = gameObject.AddComponent<ReplicationManagerServer>();
+            }
+            m_replicationServer.Init(m_linkingContext);
+
+            return true;
+        }
+
         public abstract void StopServer();
         protected abstract void Send(object connection, byte[] message);
-        protected abstract void Drop(object connection);           // stop talking to it
+        protected abstract void Drop(object connection);
         protected virtual string Describe(object connection) { return connection.ToString(); }
 
         protected void SendText(object connection, string text) { Send(connection, Messages.Text(text)); }
 
-        // ----------------------------------------------------------------------------- main thread
+        // -----------------------------------------------------------------------------
         protected virtual void Update()
         {
             NetEvent e;
@@ -61,7 +83,7 @@ namespace Delivery3
                 }
                 catch (Exception ex)
                 {
-                    Log("[SERVER] Dropped a bad message from " + Describe(e.from) + ": " + ex.Message);
+                    Log("[SERVER] Mensaje erróneo descartado de " + Describe(e.from) + ": " + ex.Message);
                     continue;
                 }
 
@@ -72,6 +94,33 @@ namespace Delivery3
                 else if (type == MsgType.Transform) OnTransform(e.from, player, objectId, pos);
                 else if (type == MsgType.Shoot) OnShoot(e.from, player, objectId, pos, dir);
                 else OnText(e.from, player, text);
+            }
+
+            if (Started)
+            {
+                m_tickTimer += Time.deltaTime;
+                if (m_tickTimer >= ServerTickRate)
+                {
+                    m_tickTimer = 0f;
+                    ServerTick();
+                }
+            }
+        }
+
+        protected virtual void ServerTick()
+        {
+            if (!Started || m_replicationServer == null) return;
+
+            foreach (Player p in m_players)
+            {
+                int netId = p.name.GetHashCode();
+                m_replicationServer.MarkUpdate(netId);
+            }
+
+            byte[] replicationPacket = m_replicationServer.WritePacket();
+            if (replicationPacket != null && replicationPacket.Length > 0)
+            {
+                BroadcastCustomBytes(replicationPacket);
             }
         }
 
@@ -84,14 +133,13 @@ namespace Delivery3
             switch (type)
             {
                 case "CHAT":
-                    if (player == null) break;                 // only players in the room may talk
+                    if (player == null) break;
                     Log("[CHAT] " + player.name + ": " + content);
                     Broadcast("CHAT:" + player.name + ": " + content);
                     break;
 
                 case "PING":
                     if (player == null) break;
-                    // content = "<clientMs>,<lastPingMs>". Echo the first part, keep the second.
                     string[] parts = content.Split(',');
                     SendText(from, "PONG:" + parts[0]);
                     int ping;
@@ -105,20 +153,15 @@ namespace Delivery3
             }
         }
 
-        // The PlayerDTO2 is the join request. From somebody already in the room it is a repeat
-        // (UDP resends until answered) or an update of its data.
         void OnPlayerData(object from, Player player, PlayerDTO2 dto)
         {
             string name = (dto.playerName ?? "").Replace(",", "").Replace(":", "").Trim();
             if (name.Length == 0) name = "Player";
             dto.playerName = name;
 
-            //if (string.IsNullOrEmpty(dto.playerRole)) dto.playerRole = "Chased";
-
             if (player != null)
             {
                 if (dto.playerName != player.name) { SendRoomStateTo(from); return; }
-                //if (Messages.Describe(dto) == Messages.Describe(player.data)) { SendRoomStateTo(from); return; }
                 player.data = dto;
                 SendRoomState();
                 return;
@@ -129,17 +172,20 @@ namespace Delivery3
             if (FindByName(name) != null) { Refuse(from, "The name " + name + " is already taken"); return; }
 
             m_players.Add(new Player { connection = from, data = dto, lastSeen = Time.realtimeSinceStartup });
+
+            if (m_replicationServer != null)
+            {
+                m_replicationServer.MarkCreate(name.GetHashCode());
+            }
+
             BroadcastSystem(name + " joined");
             SendRoomState();
         }
 
         void OnTransform(object from, Player player, int objectId, Vector3 pos)
         {
-            if (player == null) return; // Solo para las jugadores que esten en sala
-
+            if (player == null) return;
             byte[] transformPacket = Messages.Transform(objectId, pos);
-
-            // Renvia la posicion de todos los jugadores
             foreach (Player p in m_players)
             {
                 Send(p.connection, transformPacket);
@@ -149,10 +195,7 @@ namespace Delivery3
         void OnShoot(object from, Player player, int objectId, Vector3 pos, Vector3 dir)
         {
             if (player == null) return;
-
             byte[] shootPacket = Messages.Shoot(objectId, pos, dir);
-
-            // Reenvia el disparo para tdos los jugadores
             foreach (Player p in m_players)
             {
                 Send(p.connection, shootPacket);
@@ -166,7 +209,6 @@ namespace Delivery3
             Drop(to);
         }
 
-        // TCP: the client thread saw Receive return 0 or fail.
         void OnConnectionLost(object connection)
         {
             Player player = Find(connection);
@@ -176,12 +218,18 @@ namespace Delivery3
         protected void RemovePlayer(Player player, string reason)
         {
             if (!m_players.Remove(player)) return;
+
+            if (m_replicationServer != null)
+            {
+                m_replicationServer.MarkDestroy(player.name.GetHashCode());
+            }
+
             Log("[SERVER] " + player.name + " " + reason);
             BroadcastSystem(player.name + " " + reason);
             SendRoomState();
         }
 
-        // ------------------------------------------------------------------------- host buttons
+        // -------------------------------------------------------------------------
 
         public void Kick(Player player)
         {
@@ -220,7 +268,7 @@ namespace Delivery3
                             break;
                     }
                 }
-       
+
                 SendRoomState();
             }
 
@@ -228,10 +276,8 @@ namespace Delivery3
             Broadcast("START:");
         }
 
-        // ------------------------------------------------------------------------------ helpers
+        // ------------------------------------------------------------------------------
 
-        // The server owns the list: on every change everybody gets all of it again. First every
-        // player's data, then PLAYERS, so a client never shows a name it has no data for.
         void SendRoomState()
         {
             Log("[SERVER] Players (" + m_players.Count + "/" + maxPlayers + "): " + Names(", "));
@@ -247,7 +293,6 @@ namespace Delivery3
 
         void BroadcastSystem(string text) { Broadcast("CHAT:* " + text); }
 
-        // ToArray: Send can fail and remove a player while we are still looping.
         protected void Broadcast(string text)
         {
             byte[] message = Messages.Text(text);
@@ -261,7 +306,6 @@ namespace Delivery3
             return string.Join(separator, names);
         }
 
-        // Equals, not ==: two IPEndPoint objects with the same address and port are the same client.
         protected Player Find(object connection)
         {
             foreach (Player p in m_players) if (p.connection.Equals(connection)) return p;
