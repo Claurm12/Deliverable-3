@@ -128,4 +128,4 @@ MonoBehaviour:
   id: 0
   type: 0
   health: 100
-  playerRole: Chased
+  playerRole: 

@@ -32,11 +32,10 @@ namespace Delivery3
         float m_lastPing;
         bool m_closed;
 
-        // Gestores de Replicación para el Cliente (Delivery 4)
         protected ReplicationManagerClient m_replicationClient;
         protected LinkingContext m_linkingContext;
         [Header("Prefabs de Red (0: Jugador, 1: Bala, etc.)")]
-        public GameObject[] networkPrefabs; // Asigna esto o configúralo
+        public GameObject[] networkPrefabs;
 
         public event Action<int, Vector3> TransformReceived;
         public event Action<int, Vector3, Vector3> ShootReceived;
@@ -69,15 +68,14 @@ namespace Delivery3
 
         protected virtual void Awake()
         {
-            // Inicializar automáticamente los componentes de replicación en el cliente
+
             m_linkingContext = gameObject.GetComponent<LinkingContext>();
             if (m_linkingContext == null) m_linkingContext = gameObject.AddComponent<LinkingContext>();
 
             m_replicationClient = gameObject.GetComponent<ReplicationManagerClient>();
             if (m_replicationClient == null) m_replicationClient = gameObject.AddComponent<ReplicationManagerClient>();
 
-            // Si tienes una lista de prefabs asignada, se la pasamos al gestor
-            m_replicationClient.Init(m_linkingContext, networkPrefabs);
+            m_replicationClient.Init(m_linkingContext, networkPrefabs != null ? new List<GameObject>(networkPrefabs) : null);
         }
 
         protected virtual void Update()
@@ -88,15 +86,13 @@ namespace Delivery3
                 if (data == null) { Close(m_endReason); break; }
                 m_lastHeard = Time.realtimeSinceStartup;
 
-                // Si el mensaje recibido es un paquete de replicación del estado del mundo (Delivery 4)
                 if (data.Length > 0 && (MsgType)data[0] == MsgType.Replication)
                 {
                     if (m_replicationClient != null)
                     {
                         using (BinaryReader reader = new BinaryReader(new MemoryStream(data, 1, data.Length - 1)))
                         {
-                            // Le pasamos el lector y nuestro propio ID para evitar el stuttering local[cite: 29, 34]
-                            m_replicationClient.ReadPacket(reader, userName.GetHashCode());
+                            m_replicationClient.ReadPacket(reader);
                         }
                     }
                     continue;
@@ -223,6 +219,12 @@ namespace Delivery3
         public virtual void SendCustomBytes(byte[] payload)
         {
             SendBytes(payload);
+        }
+
+        public void InitReplication()
+        {
+            m_replicationClient.Init(m_linkingContext,
+                networkPrefabs != null ? new List<GameObject>(networkPrefabs) : null);
         }
     }
 }

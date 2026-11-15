@@ -21,15 +21,6 @@ namespace Delivery3
         private const float m_gravity = -20f;
         private const float m_jumpForce = 8f;
 
-        private class RemotePlayer
-        {
-            public GameObject gameObject;
-            public float lastReceiveTime;
-        }
-
-        //Guardamos los "cubos" que se relacionan con la id del obj
-        private readonly Dictionary<int, RemotePlayer> m_remotePlayers = new Dictionary<int, RemotePlayer>();
-
         void Start()
         {
             if (LobbyGUI.NeedsSession()) return;
@@ -53,25 +44,42 @@ namespace Delivery3
                 lightObj.transform.eulerAngles = new Vector3(50, -30, 0);
             }
 
-            if (session.Client != null)
-            {
-                session.Client.TransformReceived += OnRemoteTransformReceived;
-                session.Client.ShootReceived += OnRemoteShootReceived;
-            }
-
             string myName = session.Client.userName;
             m_myObjectId = myName.GetHashCode();
 
-            //Cubo local
-            m_myPlayerObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            m_myPlayerObject.name = "Player_" + myName;
-            float startX = UnityEngine.Random.Range(-3f, 3f);
-            m_myPlayerObject.transform.position = new Vector3(startX, 0.5f, 0f);
+            LinkingContext linking = FindObjectOfType<LinkingContext>();
+            if (linking != null)
+            {
+                m_myPlayerObject = linking.Find(m_myObjectId);
+            }
 
-          
-            ApplyPlayerColor(m_myPlayerObject, myName);
+            if (m_myPlayerObject == null && session.Client.networkPrefabs != null && session.Client.networkPrefabs.Length > 0)
+            {
+                GameObject prefabToSpawn = session.Client.networkPrefabs[0];
+                if (prefabToSpawn != null)
+                {
+                    m_myPlayerObject = Instantiate(prefabToSpawn);
+                    m_myPlayerObject.name = "Player_" + myName;
+                    float startX = UnityEngine.Random.Range(-3f, 3f);
+                    m_myPlayerObject.transform.position = new Vector3(startX, 0.5f, 0f);
 
-           
+                    NetObject netObj = m_myPlayerObject.GetComponent<NetObject>();
+                    if (netObj == null) netObj = m_myPlayerObject.AddComponent<NetPlayer>();
+                    netObj.id = m_myObjectId;
+                    netObj.type = 0;
+
+                    if (linking != null)
+                    {
+                        linking.Register(m_myPlayerObject, m_myObjectId);
+                    }
+                }
+            }
+
+            if (m_myPlayerObject != null)
+            {
+                ApplyPlayerColor(m_myPlayerObject, myName);
+            }
+
             string rolActual = "Chased";
             PlayerDTO2 data;
             if (session.Client.Teams.TryGetValue(myName, out data) && !string.IsNullOrEmpty(data.playerRole))
@@ -86,7 +94,7 @@ namespace Delivery3
             session.Client.Chat.Add(mensajeRol);
         }
 
-        // Color segun el rol
+        // Color según el rol asignado
         private void ApplyPlayerColor(GameObject playerObj, string playerName)
         {
             if (playerObj == null) return;
@@ -128,9 +136,7 @@ namespace Delivery3
         private Material CreatePrimitiveMaterial(UnityEngine.Color baseColor)
         {
             Material baseMat = Resources.Load<Material>("MaterialJugadores");
-
             Material mat = (baseMat != null) ? new Material(baseMat) : new Material(Shader.Find("Universal Render Pipeline/Lit"));
-
 
             if (mat.HasProperty("_BaseColor"))
             {
@@ -150,6 +156,30 @@ namespace Delivery3
             LobbySession session = LobbySession.Instance;
             LobbyClient client = session.Client;
 
+            LinkingContext linking = FindObjectOfType<LinkingContext>();
+            if (linking != null && client != null)
+            {
+                foreach (int id in linking.Ids)
+                {
+                    if (id == m_myObjectId) continue;
+
+                    GameObject remoteObj = linking.Find(id);
+                    if (remoteObj != null)
+                    {
+                        string remoteName = "";
+                        foreach (string name in client.Players)
+                        {
+                            if (name.GetHashCode() == id)
+                            {
+                                remoteName = name;
+                                break;
+                            }
+                        }
+                        ApplyPlayerColor(remoteObj, remoteName);
+                    }
+                }
+            }
+
             // Si se escribe en el chat no se mueve el jugador
             if (!m_isTypingInChat && m_myPlayerObject != null)
             {
@@ -165,7 +195,7 @@ namespace Delivery3
                 Vector3 direction = new Vector3(h, 0, v);
                 Vector3 currentPos = m_myPlayerObject.transform.position;
 
-                // Gestion del salto
+                // Gestión del salto
                 if (m_jumpRequested && currentPos.y <= 0.51f)
                 {
                     m_verticalVelocity = m_jumpForce;
@@ -191,7 +221,6 @@ namespace Delivery3
 
                 m_myPlayerObject.transform.position = currentPos;
 
-                // Enviar posicion por UDP
                 m_sendTimer += Time.deltaTime;
                 if (m_sendTimer >= 0.05f)
                 {
@@ -208,8 +237,6 @@ namespace Delivery3
                     }
                 }
 
-                //Disparar
-                // Disparar (Solo permitido si eres el Cazador)
                 if (m_shootRequested)
                 {
                     m_shootRequested = false;
@@ -232,42 +259,6 @@ namespace Delivery3
                     else
                     {
                         Debug.Log("No puedes disparar porque eres el que escapa.");
-                    }
-                }
-            }
-
-            // Limpiar jugadores desconectados
-            if (client != null && client.Players != null)
-            {
-                List<int> idsToRemove = new List<int>();
-                float currentTime = Time.realtimeSinceStartup;
-
-                foreach (KeyValuePair<int, RemotePlayer> pair in m_remotePlayers)
-                {
-                    int objectId = pair.Key;
-                    bool playerStillInRoom = false;
-
-                    foreach (string playerName in client.Players)
-                    {
-                        if (playerName.GetHashCode() == objectId)
-                        {
-                            playerStillInRoom = true;
-                            break;
-                        }
-                    }
-
-                    if (!playerStillInRoom || (currentTime - pair.Value.lastReceiveTime > 3.0f))
-                    {
-                        idsToRemove.Add(objectId);
-                    }
-                }
-
-                foreach (int id in idsToRemove)
-                {
-                    if (m_remotePlayers.TryGetValue(id, out RemotePlayer remotePlayer))
-                    {
-                        if (remotePlayer.gameObject != null) Destroy(remotePlayer.gameObject);
-                        m_remotePlayers.Remove(id);
                     }
                 }
             }
@@ -348,42 +339,6 @@ namespace Delivery3
             if (GUILayout.Button(session.IsHost ? "End game" : "Leave", GUILayout.Width(160), GUILayout.Height(40)))
                 client.Leave();
             LobbyGUI.End();
-        }
-
-        void OnRemoteTransformReceived(int objectId, Vector3 pos)
-        {
-            if (objectId == m_myObjectId) return;
-
-            RemotePlayer remotePlayer;
-            if (!m_remotePlayers.TryGetValue(objectId, out remotePlayer))
-            {
-                GameObject newObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                newObj.name = "Player_Remote_" + objectId;
-
-                string remotePlayerName = "";
-                foreach (string name in LobbySession.Instance.Client.Players)
-                {
-                    if (name.GetHashCode() == objectId)
-                    {
-                        remotePlayerName = name;
-                        break;
-                    }
-                }
-
-                remotePlayer = new RemotePlayer { gameObject = newObj, lastReceiveTime = Time.realtimeSinceStartup };
-                m_remotePlayers[objectId] = remotePlayer;
-
-                ApplyPlayerColor(newObj, remotePlayerName);
-            }
-
-            remotePlayer.gameObject.transform.position = pos;
-            remotePlayer.lastReceiveTime = Time.realtimeSinceStartup;
-        }
-
-        void OnRemoteShootReceived(int objectId, Vector3 pos, Vector3 dir)
-        {
-            if (objectId == m_myObjectId) return;
-            CreateBulletGameObject(pos, dir);
         }
     }
 

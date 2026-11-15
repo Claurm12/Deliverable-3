@@ -18,10 +18,10 @@ namespace Delivery3
 
         public LobbyProtocol protocol = LobbyProtocol.UDP;
         public string playerName = "Player";
-        public string message = "";            // why the last session ended, shown in the menu
+        public string message = "";
 
-        [Header("Network Prefabs (Delivery 4)")]
-        public GameObject[] networkPrefabs;    // Lista de prefabs sincronizados (0: Jugador, 1: Bala, etc.)
+        [Header("Network Prefabs")]
+        public GameObject[] networkPrefabs;
 
         public LobbyServer Server { get; private set; }
         public LobbyClient Client { get; private set; }
@@ -35,9 +35,14 @@ namespace Delivery3
             {
                 if (s_instance == null)
                 {
-                    GameObject go = new GameObject("LobbySession");
-                    DontDestroyOnLoad(go);
-                    s_instance = go.AddComponent<LobbySession>();
+                    s_instance = FindObjectOfType<LobbySession>();
+
+                    if (s_instance == null)
+                    {
+                        GameObject go = new GameObject("LobbySession");
+                        DontDestroyOnLoad(go);
+                        s_instance = go.AddComponent<LobbySession>();
+                    }
                 }
                 return s_instance;
             }
@@ -47,7 +52,18 @@ namespace Delivery3
 
         void Awake()
         {
-            Application.runInBackground = true;   // or the window without focus stops pinging
+            if (s_instance == null)
+            {
+                s_instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (s_instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Application.runInBackground = true;
             SceneManager.sceneLoaded += OnSceneLoaded;
             ParseCommandLine();
         }
@@ -68,6 +84,7 @@ namespace Delivery3
             Server.serverName = serverName;
             Server.port = port;
             Server.maxPlayers = maxPlayers;
+            Server.networkPrefabs = networkPrefabs;
 
             if (!Server.StartServer())
             {
@@ -76,7 +93,7 @@ namespace Delivery3
                 return false;
             }
 
-            Join("127.0.0.1", port);   // the host is a player too
+            Join("127.0.0.1", port);
             return true;
         }
 
@@ -94,6 +111,7 @@ namespace Delivery3
             Client.myData = MakePlayerData();
 
             Client.networkPrefabs = networkPrefabs;
+            Client.InitReplication();
 
             Client.Joined += delegate { SceneManager.LoadScene(RoomScene); };
             Client.GameStarted += delegate { SceneManager.LoadScene(GameScene); };
@@ -112,7 +130,7 @@ namespace Delivery3
         void OnClientClosed(string reason)
         {
             message = reason;
-            EndSession();                       // the host leaving also closes the room
+            EndSession();
             SceneManager.LoadScene(MenuScene);
         }
 

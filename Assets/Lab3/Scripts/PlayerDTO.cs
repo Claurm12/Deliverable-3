@@ -23,3 +23,10 @@ public enum MsgType : byte
     Shoot = 4,
     Replication = 5
 }
+
+public enum ReplicationAction : byte
+{
+    Create = 1,
+    Update = 2,
+    Destroy = 3
+}

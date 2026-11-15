@@ -36,6 +36,7 @@ namespace Delivery3
 
         public override bool StartServer()
         {
+            base.StartServer();
             try
             {
                 m_listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

@@ -20,6 +20,7 @@ namespace Delivery3
 
         public override bool StartServer()
         {
+            base.StartServer();
             try
             {
                 m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -100,8 +101,6 @@ namespace Delivery3
             catch (ObjectDisposedException) { }
         }
 
-        // There is no connection to close. Once it is out of the player list we ignore it, and since
-        // nobody answers its PINGs any more, the client times out by itself if it missed our message.
         protected override void Drop(object connection) { }
 
         public void BroadcastCustomBytes(byte[] payload)

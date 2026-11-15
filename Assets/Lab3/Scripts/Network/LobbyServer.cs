@@ -10,6 +10,8 @@ namespace Delivery3
         public string serverName = "MyRoom";
         public int port = 9050;
         public int maxPlayers = 4;
+        public GameObject[] networkPrefabs;
+ 
 
         public class Player
         {
@@ -29,29 +31,20 @@ namespace Delivery3
         public bool Started { get; private set; }
         public abstract bool IsRunning { get; }
 
-        // Gestores para la replicación del mundo (Delivery 4)
         protected ReplicationManagerServer m_replicationServer;
         protected LinkingContext m_linkingContext;
         private float m_tickTimer;
-        private const float ServerTickRate = 0.05f; // 20 ticks por segundo
+        private const float ServerTickRate = 0.05f;
 
-        // ------------------------------------------------------------------ 
+        
 
         public virtual bool StartServer()
         {
             m_linkingContext = gameObject.GetComponent<LinkingContext>();
             if (m_linkingContext == null)
-            {
                 m_linkingContext = gameObject.AddComponent<LinkingContext>();
-            }
 
-            m_replicationServer = gameObject.GetComponent<ReplicationManagerServer>();
-            if (m_replicationServer == null)
-            {
-                m_replicationServer = gameObject.AddComponent<ReplicationManagerServer>();
-            }
-            m_replicationServer.Init(m_linkingContext);
-
+            m_replicationServer = new ReplicationManagerServer(m_linkingContext);
             return true;
         }
 
@@ -62,7 +55,6 @@ namespace Delivery3
 
         protected void SendText(object connection, string text) { Send(connection, Messages.Text(text)); }
 
-        // -----------------------------------------------------------------------------
         protected virtual void Update()
         {
             NetEvent e;
@@ -114,16 +106,17 @@ namespace Delivery3
             foreach (Player p in m_players)
             {
                 int netId = p.name.GetHashCode();
-                m_replicationServer.MarkUpdate(netId);
+                if (m_linkingContext.Find(netId) != null)
+                    m_replicationServer.MarkUpdate(netId);
             }
 
             byte[] replicationPacket = m_replicationServer.WritePacket();
+            Debug.Log("[SERVER TICK] jugadores " + m_players.Count + " paquete " + (replicationPacket == null ? 0 : replicationPacket.Length) + " bytes");
             if (replicationPacket != null && replicationPacket.Length > 0)
             {
                 BroadcastCustomBytes(replicationPacket);
             }
         }
-
         void OnText(object from, Player player, string text)
         {
             int colon = text.IndexOf(':');
@@ -182,14 +175,29 @@ namespace Delivery3
             SendRoomState();
         }
 
+        GameObject EnsureServerObject(int id)
+        {
+            GameObject go = m_linkingContext.Find(id);
+            if (go != null) return go;
+            if (networkPrefabs == null || networkPrefabs.Length == 0 || networkPrefabs[0] == null) return null;
+
+            go = Instantiate(networkPrefabs[0]);
+            go.name = "ServerPlayer_" + id;
+
+            NetObject n = go.GetComponent<NetObject>();
+            if (n == null) n = go.AddComponent<NetPlayer>();
+            n.id = id;
+            n.type = 0;
+
+            m_linkingContext.Register(go, id);
+            return go;
+        }
         void OnTransform(object from, Player player, int objectId, Vector3 pos)
         {
             if (player == null) return;
-            byte[] transformPacket = Messages.Transform(objectId, pos);
-            foreach (Player p in m_players)
-            {
-                Send(p.connection, transformPacket);
-            }
+            GameObject go = EnsureServerObject(objectId);
+            if (go != null) go.transform.position = pos;
+            Debug.Log("[SERVER] Transform id " + objectId + " pos " + pos + " prefabs: " + (networkPrefabs == null ? "null" : networkPrefabs.Length.ToString()));
         }
 
         void OnShoot(object from, Player player, int objectId, Vector3 pos, Vector3 dir)
@@ -229,12 +237,10 @@ namespace Delivery3
             SendRoomState();
         }
 
-        // -------------------------------------------------------------------------
-
         public void Kick(Player player)
         {
             object connection = player.connection;
-            SendText(connection, "KICKED:");
+            SendText(connection, "KICKED;");
             RemovePlayer(player, "was kicked");
             Drop(connection);
         }
@@ -276,8 +282,6 @@ namespace Delivery3
             Broadcast("START:");
         }
 
-        // ------------------------------------------------------------------------------
-
         void SendRoomState()
         {
             Log("[SERVER] Players (" + m_players.Count + "/" + maxPlayers + "): " + Names(", "));
@@ -299,7 +303,7 @@ namespace Delivery3
             foreach (Player p in m_players.ToArray()) Send(p.connection, message);
         }
 
-        public string Names(string separator)
+        String Names(string separator)
         {
             List<string> names = new List<string>();
             foreach (Player p in m_players) names.Add(p.name);
