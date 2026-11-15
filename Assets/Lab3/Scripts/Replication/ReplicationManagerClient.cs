@@ -10,8 +10,9 @@ namespace Delivery3
         [SerializeField] List<GameObject> m_prefabs = new List<GameObject>();   // index = type
         LinkingContext m_linking;
         int m_lastSequence = -1;
+        int m_localId;
+        public void SetLocalId(int id) { m_localId = id; }
 
-        // The client's linking context, and optionally the prefab list if not set in the Inspector.
         public void Init(LinkingContext linking, List<GameObject> prefabs = null)
         {
             m_linking = linking;
@@ -49,7 +50,10 @@ namespace Delivery3
                     no.id = id;
                     m_linking.Register(go, id);
                 }
-                go.GetComponent<NetObject>().Read(reader);
+                NetObject target = go.GetComponent<NetObject>();
+                Vector3 keepPos = go.transform.position;
+                target.Read(reader);
+                if (id == m_localId) go.transform.position = keepPos;
             }
         }
     }

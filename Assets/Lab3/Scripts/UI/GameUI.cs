@@ -46,6 +46,7 @@ namespace Delivery3
 
             string myName = session.Client.userName;
             m_myObjectId = myName.GetHashCode();
+            FindObjectOfType<ReplicationManagerClient>().SetLocalId(m_myObjectId);
 
             LinkingContext linking = FindObjectOfType<LinkingContext>();
             if (linking != null)

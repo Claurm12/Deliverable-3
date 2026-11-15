@@ -16,8 +16,6 @@ namespace Delivery3
             new Dictionary<int, (ReplicationAction, float)>();
         int m_sequence;
 
-        // The time in seconds, Time.time on slide 15. The test scene replaces it to replay exact
-        // situations (a lost Create, a lost Destroy). In your game, leave it as it is.
         public Func<float> clock = () => Time.time;
 
         public ReplicationManagerServer(LinkingContext linking) { m_linking = linking; }
@@ -28,11 +26,10 @@ namespace Delivery3
             public TodoException(int number) : base("TODO " + number) { this.number = number; }
         }
 
-        // ------------------------------------------------------------- given, slides 10 and 15 ---
         public void MarkCreate(int id)
         {
             m_pending[id] = ReplicationAction.Create;
-            m_repeat[id] = (ReplicationAction.Create, clock() + 1f);       // repeated for 1 s
+            m_repeat[id] = (ReplicationAction.Create, clock() + 1f);
         }
 
         public void MarkDestroy(int id)
@@ -43,11 +40,11 @@ namespace Delivery3
 
         public void MarkUpdate(int id)
         {
-            if (!m_pending.ContainsKey(id))                                 // a Create or Destroy wins
+            if (!m_pending.ContainsKey(id))
                 m_pending[id] = ReplicationAction.Update;
         }
 
-        public byte[] WritePacket()                                         // once per tick
+        public byte[] WritePacket()
         {
             foreach (int id in m_repeat.Keys.ToList())
             {
