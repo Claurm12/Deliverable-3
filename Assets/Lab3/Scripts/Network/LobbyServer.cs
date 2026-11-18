@@ -166,9 +166,12 @@ namespace Delivery3
 
             m_players.Add(new Player { connection = from, data = dto, lastSeen = Time.realtimeSinceStartup });
 
+            int netId = name.GetHashCode();
+            EnsureServerObject(netId);
+
             if (m_replicationServer != null)
             {
-                m_replicationServer.MarkCreate(name.GetHashCode());
+                m_replicationServer.MarkCreate(netId);
             }
 
             BroadcastSystem(name + " joined");
@@ -258,21 +261,35 @@ namespace Delivery3
                     Player p = m_players[i];
                     int rolDesignado = (i == hunterIndex) ? 0 : 1;
 
-                    switch (rolDesignado)
+                    p.data.playerRole = (rolDesignado == 0) ? "Hunter" : "Chased";
+
+                    int netId = p.name.GetHashCode();
+                    GameObject go = m_linkingContext.Find(netId);
+                    if (go != null)
                     {
-                        case 0:
-                            p.data.playerRole = "Hunter";
-                            SendText(p.connection, "Eres el CAZADOR");
-                            break;
-                        case 1:
-                            p.data.playerRole = "Chased";
-                            SendText(p.connection, "Escapa del cazador");
-                            break;
-                        default:
-                            p.data.playerRole = "Chased";
-                            SendText(p.connection, "Escapa del cazador");
-                            break;
+                        NetObject netObj = go.GetComponent<NetObject>();
+                        if (netObj != null)
+                        {
+                            netObj.type = (byte)rolDesignado;
+                        }
+
+                        NetPlayer netPlayerComp = go.GetComponent<NetPlayer>();
+                        if (netPlayerComp != null)
+                        {
+                            netPlayerComp.playerRole = p.data.playerRole;
+                            netPlayerComp.type = (byte)rolDesignado;
+                        }
+
+                        if (m_replicationServer != null)
+                        {
+                            m_replicationServer.MarkCreate(netId);
+                        }
                     }
+
+                    if (rolDesignado == 0)
+                        SendText(p.connection, "Eres el CAZADOR");
+                    else
+                        SendText(p.connection, "Escapa del cazador");
                 }
 
                 SendRoomState();

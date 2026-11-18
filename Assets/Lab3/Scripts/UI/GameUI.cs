@@ -54,9 +54,18 @@ namespace Delivery3
                 m_myPlayerObject = linking.Find(m_myObjectId);
             }
 
-            if (m_myPlayerObject == null && session.Client.networkPrefabs != null && session.Client.networkPrefabs.Length > 0)
+            string rolActual = "Chased";
+            PlayerDTO2 data;
+            if (session.Client.Teams.TryGetValue(myName, out data) && !string.IsNullOrEmpty(data.playerRole))
             {
-                GameObject prefabToSpawn = session.Client.networkPrefabs[0];
+                rolActual = data.playerRole;
+            }
+
+            int prefabIndex = (rolActual == "Hunter") ? 0 : 1;
+
+            if (m_myPlayerObject == null && session.Client.networkPrefabs != null && session.Client.networkPrefabs.Length > prefabIndex)
+            {
+                GameObject prefabToSpawn = session.Client.networkPrefabs[prefabIndex];
                 if (prefabToSpawn != null)
                 {
                     m_myPlayerObject = Instantiate(prefabToSpawn);
@@ -67,7 +76,7 @@ namespace Delivery3
                     NetObject netObj = m_myPlayerObject.GetComponent<NetObject>();
                     if (netObj == null) netObj = m_myPlayerObject.AddComponent<NetPlayer>();
                     netObj.id = m_myObjectId;
-                    netObj.type = 0;
+                    netObj.type = (byte)prefabIndex;
 
                     if (linking != null)
                     {
@@ -79,13 +88,6 @@ namespace Delivery3
             if (m_myPlayerObject != null)
             {
                 ApplyPlayerColor(m_myPlayerObject, myName);
-            }
-
-            string rolActual = "Chased";
-            PlayerDTO2 data;
-            if (session.Client.Teams.TryGetValue(myName, out data) && !string.IsNullOrEmpty(data.playerRole))
-            {
-                rolActual = data.playerRole;
             }
 
             string mensajeRol = (rolActual == "Hunter")
