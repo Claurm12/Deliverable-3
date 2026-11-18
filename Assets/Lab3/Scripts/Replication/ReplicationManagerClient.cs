@@ -41,6 +41,18 @@ namespace Delivery3
                 }
 
                 byte type = reader.ReadByte();
+
+                if (go != null)
+                {
+                    NetObject existingNetObj = go.GetComponent<NetObject>();
+                    if (existingNetObj != null && existingNetObj.type != type)
+                    {
+                        Destroy(go);
+                        m_linking.Unregister(id);
+                        go = null;
+                    }
+                }
+
                 if (go == null)
                 {
                     Debug.Log("[REPL CLIENT] creando id " + id + " tipo " + type);
@@ -48,8 +60,10 @@ namespace Delivery3
                     NetObject no = go.GetComponent<NetObject>();
                     if (no == null) no = go.AddComponent<NetPlayer>();
                     no.id = id;
+                    no.type = type;
                     m_linking.Register(go, id);
                 }
+
                 NetObject target = go.GetComponent<NetObject>();
                 Vector3 keepPos = go.transform.position;
                 target.Read(reader);
