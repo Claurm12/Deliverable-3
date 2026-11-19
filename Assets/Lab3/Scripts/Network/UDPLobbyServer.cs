@@ -103,7 +103,7 @@ namespace Delivery3
 
         protected override void Drop(object connection) { }
 
-        public void BroadcastCustomBytes(byte[] payload)
+        public override void BroadcastCustomBytes(byte[] payload)
         {
             foreach (Player p in Players)
             {

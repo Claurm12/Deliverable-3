@@ -21,5 +21,21 @@ namespace Delivery3
             transform.position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             transform.rotation = Quaternion.Euler(0f, reader.ReadSingle(), 0f);
         }
+        public static int ComputeId(string value)
+        {
+            unchecked
+            {
+                const int fnvPrime = 16777619;
+                int hash = (int)2166136261;
+                if (value == null) return hash;
+                for (int i = 0; i < value.Length; i++)
+                {
+                    hash ^= value[i];
+                    hash *= fnvPrime;
+                }
+                return hash;
+            }
+        }
     }
+
 }

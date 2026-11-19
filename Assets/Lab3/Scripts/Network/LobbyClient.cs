@@ -34,6 +34,7 @@ namespace Delivery3
 
         protected ReplicationManagerClient m_replicationClient;
         protected LinkingContext m_linkingContext;
+
         [Header("Prefabs de Red (0: Jugador, 1: Bala, etc.)")]
         public GameObject[] networkPrefabs;
 
@@ -68,14 +69,46 @@ namespace Delivery3
 
         protected virtual void Awake()
         {
+            EnsureReplicationComponents();
+        }
 
-            m_linkingContext = gameObject.GetComponent<LinkingContext>();
-            if (m_linkingContext == null) m_linkingContext = gameObject.AddComponent<LinkingContext>();
+        protected void EnsureReplicationComponents()
+        {
+            if (m_linkingContext == null)
+            {
+                m_linkingContext = gameObject.GetComponent<LinkingContext>();
+                if (m_linkingContext == null)
+                {
+                    m_linkingContext = gameObject.AddComponent<LinkingContext>();
+                }
+            }
 
-            m_replicationClient = gameObject.GetComponent<ReplicationManagerClient>();
-            if (m_replicationClient == null) m_replicationClient = gameObject.AddComponent<ReplicationManagerClient>();
+            if (m_replicationClient == null)
+            {
+                m_replicationClient = gameObject.GetComponent<ReplicationManagerClient>();
+                if (m_replicationClient == null)
+                {
+                    m_replicationClient = gameObject.AddComponent<ReplicationManagerClient>();
+                }
+            }
 
-            m_replicationClient.Init(m_linkingContext, networkPrefabs != null ? new List<GameObject>(networkPrefabs) : null);
+            GameObject[] prefabsToUse = GetEffectivePrefabs();
+            m_replicationClient.Init(m_linkingContext, prefabsToUse != null ? new List<GameObject>(prefabsToUse) : null);
+        }
+
+        GameObject[] GetEffectivePrefabs()
+        {
+            if (networkPrefabs != null && networkPrefabs.Length > 0)
+            {
+                return networkPrefabs;
+            }
+
+            if (LobbySession.Instance != null && LobbySession.Instance.networkPrefabs != null && LobbySession.Instance.networkPrefabs.Length > 0)
+            {
+                return LobbySession.Instance.networkPrefabs;
+            }
+
+            return null;
         }
 
         protected virtual void Update()
@@ -223,8 +256,7 @@ namespace Delivery3
 
         public void InitReplication()
         {
-            m_replicationClient.Init(m_linkingContext,
-                networkPrefabs != null ? new List<GameObject>(networkPrefabs) : null);
+            EnsureReplicationComponents();
         }
     }
 }

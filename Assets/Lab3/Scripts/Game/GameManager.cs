@@ -8,7 +8,6 @@ namespace Delivery3
         public static GameManager Instance { get; private set; }
 
         private int m_myObjectId;
-        private HashSet<int> m_coloredPlayers = new HashSet<int>();
 
         void Awake()
         {
@@ -30,23 +29,34 @@ namespace Delivery3
             }
 
             string myName = session.Client.userName;
-            m_myObjectId = myName.GetHashCode();
-            FindObjectOfType<ReplicationManagerClient>().SetLocalId(m_myObjectId);
+            m_myObjectId = NetObject.ComputeId(myName);
 
             LinkingContext linking = FindObjectOfType<LinkingContext>();
-            GameObject myPlayerObject = (linking != null) ? linking.Find(m_myObjectId) : null;
+            ReplicationManagerClient replClient = FindObjectOfType<ReplicationManagerClient>();
 
-            string rolActual = "Chased";
-            if (session.Client.Teams.TryGetValue(myName, out PlayerDTO2 data) && !string.IsNullOrEmpty(data.playerRole))
+            if (replClient != null)
             {
-                rolActual = data.playerRole;
+                replClient.SetLocalId(m_myObjectId);
+                GameObject[] prefabs = GetPrefabs(session);
+                if (prefabs != null && prefabs.Length > 0)
+                {
+                    replClient.Init(linking, new List<GameObject>(prefabs));
+                }
             }
 
+            GameObject myPlayerObject = (linking != null) ? linking.Find(m_myObjectId) : null;
+            string rolActual = GetRoleFromClient(session.Client, myName);
             int prefabIndex = (rolActual == "Hunter") ? 0 : 1;
 
-            if (myPlayerObject == null && session.Client.networkPrefabs != null && session.Client.networkPrefabs.Length > prefabIndex)
+            GameObject[] currentPrefabs = GetPrefabs(session);
+            if (myPlayerObject == null && currentPrefabs != null && currentPrefabs.Length > 0)
             {
-                GameObject prefabToSpawn = session.Client.networkPrefabs[prefabIndex];
+                if (prefabIndex >= currentPrefabs.Length || currentPrefabs[prefabIndex] == null)
+                {
+                    prefabIndex = 0;
+                }
+
+                GameObject prefabToSpawn = currentPrefabs[prefabIndex];
                 if (prefabToSpawn != null)
                 {
                     myPlayerObject = Instantiate(prefabToSpawn);
@@ -68,25 +78,8 @@ namespace Delivery3
 
             if (myPlayerObject != null)
             {
-                ApplyPlayerColor(myPlayerObject, myName);
-
-                // Añadimos el controlador solo a nuestro jugador local
-                PlayerController controller = myPlayerObject.AddComponent<PlayerController>();
-                controller.objectId = m_myObjectId;
-
-                // Asignamos este jugador a la cámara
-                CameraControl camControl = FindObjectOfType<CameraControl>();
-                if (camControl != null)
-                {
-                    camControl.target = myPlayerObject.transform;
-                }
+                EnsureLocalPlayerSetup(myPlayerObject);
             }
-
-            string mensajeRol = (rolActual == "Hunter")
-                ? "Eres el CAZADOR"
-                : "ESCAPA del cazador";
-
-            session.Client.Chat.Add(mensajeRol);
         }
 
         void Update()
@@ -95,79 +88,73 @@ namespace Delivery3
             LobbyClient client = LobbySession.Instance.Client;
             LinkingContext linking = FindObjectOfType<LinkingContext>();
 
-            if (linking != null && client != null)
-            {
-                foreach (int id in linking.Ids)
-                {
-                    if (id == m_myObjectId || m_coloredPlayers.Contains(id)) continue;
+            if (linking == null || client == null) return;
 
-                    GameObject remoteObj = linking.Find(id);
-                    if (remoteObj != null)
-                    {
-                        foreach (string name in client.Players)
-                        {
-                            if (name.GetHashCode() == id)
-                            {
-                                ApplyPlayerColor(remoteObj, name);
-                                m_coloredPlayers.Add(id);
-                                break;
-                            }
-                        }
-                    }
+            GameObject myObj = linking.Find(m_myObjectId);
+            if (myObj != null)
+            {
+                EnsureLocalPlayerSetup(myObj);
+            }
+
+            foreach (int id in linking.Ids)
+            {
+                if (id == m_myObjectId) continue;
+                GameObject otherObj = linking.Find(id);
+                if (otherObj == null) continue;
+
+                PlayerController otherCtrl = otherObj.GetComponent<PlayerController>();
+                if (otherCtrl != null)
+                {
+                    otherCtrl.enabled = false;
                 }
             }
         }
 
-        public void ApplyPlayerColor(GameObject playerObj, string playerName)
+        private void EnsureLocalPlayerSetup(GameObject playerObj)
         {
-            if (playerObj == null) return;
-
-            LobbySession session = LobbySession.Instance;
-            string rolActual = "Chased";
-
-            if (session.Client != null && session.Client.Teams.TryGetValue(playerName, out PlayerDTO2 data))
+            PlayerController ctrl = playerObj.GetComponent<PlayerController>();
+            if (ctrl == null)
             {
-                if (!string.IsNullOrEmpty(data.playerRole))
-                {
-                    rolActual = data.playerRole;
-                }
+                ctrl = playerObj.AddComponent<PlayerController>();
+            }
+            ctrl.enabled = true;
+            ctrl.objectId = m_myObjectId;
+
+            Rigidbody rb = playerObj.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
             }
 
-            Renderer rend = playerObj.GetComponent<Renderer>();
-            if (rend != null)
+            CameraControl cam = FindObjectOfType<CameraControl>();
+            if (cam != null && cam.target != playerObj.transform)
             {
-                Color targetColor;
-                switch (rolActual)
-                {
-                    case "Hunter":
-                        targetColor = Color.red;
-                        break;
-                    case "Chased":
-                        targetColor = Color.blue;
-                        break;
-                    default:
-                        targetColor = Color.gray;
-                        break;
-                }
-                rend.material = CreatePrimitiveMaterial(targetColor);
+                cam.target = playerObj.transform;
             }
         }
 
-        private Material CreatePrimitiveMaterial(Color baseColor)
+        private string GetRoleFromClient(LobbyClient client, string playerName)
         {
-            Material baseMat = Resources.Load<Material>("MaterialJugadores");
-            Material mat = (baseMat != null) ? new Material(baseMat) : new Material(Shader.Find("Universal Render Pipeline/Lit"));
-
-            if (mat.HasProperty("_BaseColor"))
+            if (client != null && !string.IsNullOrEmpty(playerName) &&
+                client.Teams.TryGetValue(playerName, out PlayerDTO2 data) &&
+                !string.IsNullOrEmpty(data.playerRole))
             {
-                mat.SetColor("_BaseColor", baseColor);
+                return data.playerRole;
             }
-            else
-            {
-                mat.color = baseColor;
-            }
+            return "Chased";
+        }
 
-            return mat;
+        private GameObject[] GetPrefabs(LobbySession session)
+        {
+            if (session != null && session.Client != null && session.Client.networkPrefabs != null && session.Client.networkPrefabs.Length > 0)
+            {
+                return session.Client.networkPrefabs;
+            }
+            if (session != null && session.networkPrefabs != null && session.networkPrefabs.Length > 0)
+            {
+                return session.networkPrefabs;
+            }
+            return null;
         }
 
         public void SpawnAndSendBullet(LobbySession session, LobbyClient client, int objectId, Vector3 pos, Vector3 dir)
@@ -192,11 +179,6 @@ namespace Delivery3
             bullet.transform.localScale = Vector3.one * 0.4f;
             BulletMover mover = bullet.AddComponent<BulletMover>();
             mover.SetDirection(dir);
-            Renderer rend = bullet.GetComponent<Renderer>();
-            if (rend != null)
-            {
-                rend.material = CreatePrimitiveMaterial(Color.yellow);
-            }
         }
     }
 

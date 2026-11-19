@@ -11,7 +11,6 @@ namespace Delivery3
         public int port = 9050;
         public int maxPlayers = 4;
         public GameObject[] networkPrefabs;
- 
 
         public class Player
         {
@@ -35,8 +34,6 @@ namespace Delivery3
         protected LinkingContext m_linkingContext;
         private float m_tickTimer;
         private const float ServerTickRate = 0.05f;
-
-        
 
         public virtual bool StartServer()
         {
@@ -105,7 +102,7 @@ namespace Delivery3
 
             foreach (Player p in m_players)
             {
-                int netId = p.name.GetHashCode();
+                int netId = NetObject.ComputeId(p.name);
                 if (m_linkingContext.Find(netId) != null)
                     m_replicationServer.MarkUpdate(netId);
             }
@@ -117,6 +114,7 @@ namespace Delivery3
                 BroadcastCustomBytes(replicationPacket);
             }
         }
+
         void OnText(object from, Player player, string text)
         {
             int colon = text.IndexOf(':');
@@ -166,7 +164,7 @@ namespace Delivery3
 
             m_players.Add(new Player { connection = from, data = dto, lastSeen = Time.realtimeSinceStartup });
 
-            int netId = name.GetHashCode();
+            int netId = NetObject.ComputeId(name);
             EnsureServerObject(netId);
 
             if (m_replicationServer != null)
@@ -195,11 +193,13 @@ namespace Delivery3
             m_linkingContext.Register(go, id);
             return go;
         }
+
         void OnTransform(object from, Player player, int objectId, Vector3 pos)
         {
             if (player == null) return;
             GameObject go = EnsureServerObject(objectId);
             if (go != null) go.transform.position = pos;
+            if (m_replicationServer != null) m_replicationServer.MarkUpdate(objectId);
             Debug.Log("[SERVER] Transform id " + objectId + " pos " + pos + " prefabs: " + (networkPrefabs == null ? "null" : networkPrefabs.Length.ToString()));
         }
 
@@ -232,7 +232,7 @@ namespace Delivery3
 
             if (m_replicationServer != null)
             {
-                m_replicationServer.MarkDestroy(player.name.GetHashCode());
+                m_replicationServer.MarkDestroy(NetObject.ComputeId(player.name));
             }
 
             Log("[SERVER] " + player.name + " " + reason);
@@ -243,7 +243,7 @@ namespace Delivery3
         public void Kick(Player player)
         {
             object connection = player.connection;
-            SendText(connection, "KICKED;");
+            SendText(connection, "KICKED:");
             RemovePlayer(player, "was kicked");
             Drop(connection);
         }
@@ -259,37 +259,40 @@ namespace Delivery3
                 for (int i = 0; i < m_players.Count; i++)
                 {
                     Player p = m_players[i];
-                    int rolDesignado = (i == hunterIndex) ? 0 : 1;
+                    bool isHunter = (i == hunterIndex);
+                    p.data.playerRole = isHunter ? "Hunter" : "Chased";
 
-                    p.data.playerRole = (rolDesignado == 0) ? "Hunter" : "Chased";
+                    // Ajusta 0 y 1 según el orden de tus prefabs en networkPrefabs
+                    int prefabType = isHunter ? 0 : 1;
+                    if (networkPrefabs == null || prefabType >= networkPrefabs.Length || networkPrefabs[prefabType] == null)
+                    {
+                        prefabType = 0;
+                    }
 
-                    int netId = p.name.GetHashCode();
+                    int netId = NetObject.ComputeId(p.name);
                     GameObject go = m_linkingContext.Find(netId);
                     if (go != null)
                     {
                         NetObject netObj = go.GetComponent<NetObject>();
                         if (netObj != null)
                         {
-                            netObj.type = (byte)rolDesignado;
+                            netObj.type = (byte)prefabType;
                         }
 
                         NetPlayer netPlayerComp = go.GetComponent<NetPlayer>();
                         if (netPlayerComp != null)
                         {
                             netPlayerComp.playerRole = p.data.playerRole;
-                            netPlayerComp.type = (byte)rolDesignado;
+                            netPlayerComp.type = (byte)prefabType;
                         }
 
                         if (m_replicationServer != null)
                         {
-                            m_replicationServer.MarkCreate(netId);
+                            m_replicationServer.MarkUpdate(netId);
                         }
                     }
 
-                    if (rolDesignado == 0)
-                        SendText(p.connection, "Eres el CAZADOR");
-                    else
-                        SendText(p.connection, "Escapa del cazador");
+                    SendText(p.connection, isHunter ? "CHAT:Eres el CAZADOR" : "CHAT:Escapa del cazador");
                 }
 
                 SendRoomState();
@@ -320,7 +323,7 @@ namespace Delivery3
             foreach (Player p in m_players.ToArray()) Send(p.connection, message);
         }
 
-        String Names(string separator)
+        string Names(string separator)
         {
             List<string> names = new List<string>();
             foreach (Player p in m_players) names.Add(p.name);
