@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 477882}
   - component: {fileID: 13745764}
+  - component: {fileID: 5340116202383176986}
+  - component: {fileID: 6791284131459266937}
   m_Layer: 0
   m_Name: Body_british_A
   m_TagString: Untagged
@@ -106,6 +108,51 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.06261784, y: -0.04901004, z: 0.000000059604645}
     m_Extent: {x: 0.5168687, y: 0.37416363, z: 0.77071524}
   m_DirtyAABB: 0
+--- !u!64 &5340116202383176986
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105134}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300644, guid: 040d65e685ff26942ab4aa696c1b782b, type: 3}
+--- !u!136 &6791284131459266937
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105134}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.9592211
+  m_Height: 1.9184422
+  m_Direction: 1
+  m_Center: {x: 0.000000059604645, y: 0.08513498, z: 0.70221186}
 --- !u!1 &112812
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,6 +260,7 @@ GameObject:
   - component: {fileID: 403756}
   - component: {fileID: 3345254}
   - component: {fileID: 2357264}
+  - component: {fileID: 4222487953031371847}
   m_Layer: 0
   m_Name: w_rifle
   m_TagString: Untagged
@@ -292,6 +340,28 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &4222487953031371847
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117412}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300480, guid: 040d65e685ff26942ab4aa696c1b782b, type: 3}
 --- !u!1 &125592
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,6 +1006,7 @@ GameObject:
   - component: {fileID: 421558}
   - component: {fileID: 3377644}
   - component: {fileID: 2309318}
+  - component: {fileID: 715141455031618802}
   m_Layer: 0
   m_Name: Head_british_B
   m_TagString: Untagged
@@ -1015,6 +1086,28 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &715141455031618802
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 195514}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300540, guid: 040d65e685ff26942ab4aa696c1b782b, type: 3}
 --- !u!1 &196250
 GameObject:
   m_ObjectHideFlags: 0

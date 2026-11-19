@@ -21,7 +21,10 @@ namespace Delivery3
         private const float m_gravity = -20f;
         private const float m_jumpForce = 8f;
 
-        void Start()
+        //Camara en player
+        private Transform m_cameraTransform;
+        private Vector3 m_cameraOffset = new Vector3(0f, 5f, -10f);
+        void Start()    
         {
             if (LobbyGUI.NeedsSession()) return;
             LobbySession session = LobbySession.Instance;
@@ -34,6 +37,12 @@ namespace Delivery3
                 cam.tag = "MainCamera";
                 camObj.transform.position = new Vector3(0, 5, -10);
                 camObj.transform.eulerAngles = new Vector3(25, 0, 0);
+            }
+
+            if (Camera.main != null)
+            {
+                m_cameraTransform = Camera.main.transform;
+                m_cameraTransform.eulerAngles = new Vector3(25, 0, 0);
             }
 
             if (FindObjectOfType<Light>() == null)
@@ -264,6 +273,22 @@ namespace Delivery3
                         Debug.Log("No puedes disparar porque eres el que escapa.");
                     }
                 }
+            }
+        }
+
+        void LateUpdate()
+        {
+            if (m_myPlayerObject != null && m_cameraTransform != null)
+            {
+                // camara reespecto jugador
+                Vector3 targetPosition = m_myPlayerObject.transform.position + m_cameraOffset;
+
+                // Movimiento camara
+                m_cameraTransform.position = Vector3.Lerp(
+                    m_cameraTransform.position,
+                    targetPosition,
+                    10f * Time.deltaTime
+                );
             }
         }
 
