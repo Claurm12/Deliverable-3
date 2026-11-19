@@ -63,12 +63,13 @@ namespace Delivery3
                 PlayerDTO2 dto;
                 int objectId;
                 Vector3 pos;
+                float rotY;
                 Vector3 dir;
                 MsgType type;
 
                 try
                 {
-                    type = Messages.Read(e.data, out text, out dto, out objectId, out pos, out dir);
+                    type = Messages.Read(e.data, out text, out dto, out objectId, out pos, out rotY, out dir);
                 }
                 catch (Exception ex)
                 {
@@ -80,7 +81,7 @@ namespace Delivery3
                 if (player != null) player.lastSeen = Time.realtimeSinceStartup;
 
                 if (type == MsgType.Player) OnPlayerData(e.from, player, dto);
-                else if (type == MsgType.Transform) OnTransform(e.from, player, objectId, pos);
+                else if (type == MsgType.Transform) OnTransform(e.from, player, objectId, pos, rotY);
                 else if (type == MsgType.Shoot) OnShoot(e.from, player, objectId, pos, dir);
                 else OnText(e.from, player, text);
             }
@@ -208,12 +209,16 @@ namespace Delivery3
             return go;
         }
 
-        void OnTransform(object from, Player player, int objectId, Vector3 pos)
+        void OnTransform(object from, Player player, int objectId, Vector3 pos, float rotY)
         {
             if (player == null) return;
             int prefabType = (player.data.playerRole == "Hunter") ? 0 : 1;
             GameObject go = EnsureServerObject(objectId, prefabType);
-            if (go != null) go.transform.position = pos;
+            if (go != null) 
+            { 
+                go.transform.position = pos;
+                go.transform.rotation = Quaternion.Euler(0f, rotY, 0f);
+            }
             if (m_replicationServer != null) m_replicationServer.MarkUpdate(objectId);
         }
 

@@ -114,7 +114,7 @@ namespace Delivery3
             CreateBulletGameObject(pos, dir);
         }
 
-        private void OnRemoteTransformReceived(int objectId, Vector3 pos)
+        private void OnRemoteTransformReceived(int objectId, Vector3 pos, float rotY)
         {
             if (objectId == m_myObjectId) return;
             LobbyClient client = LobbySession.Instance != null ? LobbySession.Instance.Client : null;
@@ -125,6 +125,7 @@ namespace Delivery3
             if (obj != null)
             {
                 obj.transform.position = pos;
+                obj.transform.rotation = Quaternion.Euler(0f, rotY, 0f);
             }
         }
 

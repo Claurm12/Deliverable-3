@@ -27,7 +27,7 @@ namespace Delivery3
             if (m_sendTimer >= 0.05f)
             {
                 m_sendTimer = 0f;
-                byte[] packet = Messages.Transform(objectId, transform.position);
+                byte[] packet = Messages.Transform(objectId, transform.position, transform.eulerAngles.y);
 
                 if (session.IsHost)
                 {

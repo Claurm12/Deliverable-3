@@ -38,7 +38,7 @@ namespace Delivery3
         [Header("Prefabs de Red (0: Jugador, 1: Bala, etc.)")]
         public GameObject[] networkPrefabs;
 
-        public event Action<int, Vector3> TransformReceived;
+        public event Action<int, Vector3, float> TransformReceived;
         public event Action<int, Vector3, Vector3> ShootReceived;
 
         public abstract void Connect();
@@ -135,12 +135,13 @@ namespace Delivery3
                 PlayerDTO2 dto;
                 int objectId;
                 Vector3 pos;
+                float rotY;
                 Vector3 dir;
                 MsgType type;
 
                 try
                 {
-                    type = Messages.Read(data, out text, out dto, out objectId, out pos, out dir);
+                    type = Messages.Read(data, out text, out dto, out objectId, out pos, out rotY, out dir);
                 }
                 catch (Exception e)
                 {
@@ -154,7 +155,7 @@ namespace Delivery3
                 }
                 else if (type == MsgType.Transform)
                 {
-                    if (TransformReceived != null) TransformReceived(objectId, pos);
+                    if (TransformReceived != null) TransformReceived(objectId, pos, rotY);
                 }
                 else if (type == MsgType.Shoot)
                 {

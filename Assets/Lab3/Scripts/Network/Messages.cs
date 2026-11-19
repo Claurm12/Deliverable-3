@@ -53,12 +53,13 @@ namespace Delivery3
         }
 
 
-        public static MsgType Read(byte[] data, out string text, out PlayerDTO2 player, out int objectId, out Vector3 pos, out Vector3 dir)
+        public static MsgType Read(byte[] data, out string text, out PlayerDTO2 player, out int objectId, out Vector3 pos, out float rotY, out Vector3 dir)
         {
             text = null;
             player = new PlayerDTO2();
             objectId = 0;
             pos = Vector3.zero;
+            rotY = 0f;
             dir = Vector3.zero;
 
             if (data == null || data.Length < 1) throw new InvalidDataException("empty message");
@@ -78,9 +79,10 @@ namespace Delivery3
                     break;
 
                 case MsgType.Transform:
-                    byte[] bodyTransform = new byte[data.Length - 1];
+                    byte[] bodyTransform = new byte[data.Length - 5]; // 4 bytes menos que pertenecen a rotY
                     Array.Copy(data, 1, bodyTransform, 0, bodyTransform.Length);
                     Serializer.DeserializeTransform(bodyTransform, out objectId, out pos);
+                    rotY = BitConverter.ToSingle(data, data.Length - 4); // Leemos el float rotY del final
                     break;
 
                 case MsgType.Shoot:
@@ -95,7 +97,19 @@ namespace Delivery3
             return type;
         }
 
-     
+        // Sustituye tu método Transform(...) por este (añade 'float rotY'):
+        public static byte[] Transform(int objectId, Vector3 pos, float rotY)
+        {
+            byte[] body = Serializer.SerializeTransform(objectId, pos);
+            byte[] rotBytes = BitConverter.GetBytes(rotY);
+            byte[] message = new byte[1 + body.Length + 4];
+            message[0] = (byte)MsgType.Transform;
+            body.CopyTo(message, 1);
+            rotBytes.CopyTo(message, 1 + body.Length);
+            return message;
+        }
+
+
         public static byte[] Transform(int objectId, Vector3 pos)
         {
             byte[] body = Serializer.SerializeTransform(objectId, pos);
