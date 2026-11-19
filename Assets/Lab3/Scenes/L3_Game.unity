@@ -10634,6 +10634,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 834242005380108154, guid: 4fa7824a621d72c419d77f7c478045eb, type: 3}
   m_PrefabInstance: {fileID: 1394511431}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1395177004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1395177006}
+  - component: {fileID: 1395177005}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1395177005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395177004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21e8b380e78e600499e8b196a506a380, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Delivery3.GameManager
+--- !u!4 &1395177006
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395177004}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1402992438
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14625,6 +14669,7 @@ GameObject:
   - component: {fileID: 1921873149}
   - component: {fileID: 1921873148}
   - component: {fileID: 1921873150}
+  - component: {fileID: 1921873151}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: Untagged
@@ -14742,6 +14787,21 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &1921873151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921873147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d163cdeeba3f7164d8eb8c30aac05cda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Delivery3.CameraControl
+  target: {fileID: 0}
+  offset: {x: 0, y: 5, z: -10}
+  smoothSpeed: 10
 --- !u!1001 &1923784958
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16562,3 +16622,4 @@ SceneRoots:
   - {fileID: 413312199}
   - {fileID: 1409999002}
   - {fileID: 1172603892}
+  - {fileID: 1395177006}
