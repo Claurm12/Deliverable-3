@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -7,10 +6,11 @@ namespace Delivery3
 {
     public class ReplicationManagerClient : MonoBehaviour
     {
-        [SerializeField] List<GameObject> m_prefabs = new List<GameObject>();   // index = type
+        [SerializeField] List<GameObject> m_prefabs = new List<GameObject>();   // 0 = Hunter, 1 = Chased
         LinkingContext m_linking;
         int m_lastSequence = -1;
         int m_localId;
+
         public void SetLocalId(int id) { m_localId = id; }
 
         public void Init(LinkingContext linking, List<GameObject> prefabs = null)
@@ -47,28 +47,56 @@ namespace Delivery3
                     NetObject existingNetObj = go.GetComponent<NetObject>();
                     if (existingNetObj != null && existingNetObj.type != type)
                     {
+                        Vector3 oldPos = go.transform.position;
+                        Quaternion oldRot = go.transform.rotation;
+
                         Destroy(go);
                         m_linking.Unregister(id);
-                        go = null;
+                        go = InstantiatePrefab(id, type);
+                        if (go != null)
+                        {
+                            go.transform.position = oldPos;
+                            go.transform.rotation = oldRot;
+                        }
                     }
                 }
 
                 if (go == null)
                 {
                     Debug.Log("[REPL CLIENT] creando id " + id + " tipo " + type);
-                    go = Instantiate(m_prefabs[type]);
-                    NetObject no = go.GetComponent<NetObject>();
-                    if (no == null) no = go.AddComponent<NetPlayer>();
-                    no.id = id;
-                    no.type = type;
-                    m_linking.Register(go, id);
+                    go = InstantiatePrefab(id, type);
+                    if (go == null) continue;
                 }
 
                 NetObject target = go.GetComponent<NetObject>();
                 Vector3 keepPos = go.transform.position;
+                Quaternion keepRot = go.transform.rotation;
                 target.Read(reader);
-                if (id == m_localId) go.transform.position = keepPos;
+
+                if (id == m_localId)
+                {
+                    go.transform.position = keepPos;
+                    go.transform.rotation = keepRot;
+                }
             }
+        }
+
+        private GameObject InstantiatePrefab(int id, byte type)
+        {
+            if (m_prefabs == null || m_prefabs.Count == 0)
+            {
+                Debug.LogError("[REPL CLIENT] No hay prefabs configurados.");
+                return null;
+            }
+
+            int index = (type < m_prefabs.Count && m_prefabs[type] != null) ? type : 0;
+            GameObject go = Instantiate(m_prefabs[index]);
+            NetObject no = go.GetComponent<NetObject>();
+            if (no == null) no = go.AddComponent<NetPlayer>();
+            no.id = id;
+            no.type = (byte)index;
+            m_linking.Register(go, id);
+            return go;
         }
     }
 }

@@ -48,5 +48,5 @@ MonoBehaviour:
   playerName: Player
   message: 
   networkPrefabs:
-  - {fileID: 6865077000556583477, guid: 16ac6cf2ccc273d40a3b6b4f1d172cb6, type: 3}
   - {fileID: 4416811643739159606, guid: 47c6927792cd6c2408018098f5959058, type: 3}
+  - {fileID: 6865077000556583477, guid: 16ac6cf2ccc273d40a3b6b4f1d172cb6, type: 3}

@@ -50,14 +50,14 @@ namespace Delivery3
                 try { received = s.ReceiveFrom(buffer, ref from); }
                 catch (SocketException e)
                 {
-                    if (e.SocketErrorCode == SocketError.ConnectionReset) continue;   // nobody on that port
+                    if (e.SocketErrorCode == SocketError.ConnectionReset) continue;
                     return;
                 }
                 catch (ObjectDisposedException) { return; }
 
                 byte[] payload = new byte[received];
-                    Array.Copy(buffer, payload, received);
-                    m_inbox.Enqueue(payload);
+                Array.Copy(buffer, payload, received);
+                m_inbox.Enqueue(payload);
             }
         }
 
@@ -70,7 +70,7 @@ namespace Delivery3
             if (!InRoom && now - m_lastJoin >= 1f)
             {
                 m_lastJoin = now;
-                SendBytes(JoinMessage());   // the first one may have been lost
+                SendBytes(JoinMessage());
             }
             if (now - m_lastHeard > timeoutSeconds)
                 Close(InRoom ? "Server lost: nothing received for " + timeoutSeconds + " s"
@@ -94,7 +94,8 @@ namespace Delivery3
             if (m_thread != null) m_thread.Join(500);
             m_thread = null;
         }
-        public void SendCustomBytes(byte[] payload)
+
+        public override void SendCustomBytes(byte[] payload)
         {
             SendBytes(payload);
         }

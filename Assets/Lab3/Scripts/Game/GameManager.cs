@@ -8,6 +8,7 @@ namespace Delivery3
         public static GameManager Instance { get; private set; }
 
         private int m_myObjectId;
+        private LobbyClient m_subscribedClient;
 
         void Awake()
         {
@@ -28,11 +29,13 @@ namespace Delivery3
                 lightObj.transform.eulerAngles = new Vector3(50, -30, 0);
             }
 
+            SubscribeClientEvents(session.Client);
+
             string myName = session.Client.userName;
             m_myObjectId = NetObject.ComputeId(myName);
 
-            LinkingContext linking = FindObjectOfType<LinkingContext>();
-            ReplicationManagerClient replClient = FindObjectOfType<ReplicationManagerClient>();
+            LinkingContext linking = GetLinkingContext(session.Client);
+            ReplicationManagerClient replClient = GetReplicationClient(session.Client);
 
             if (replClient != null)
             {
@@ -82,11 +85,74 @@ namespace Delivery3
             }
         }
 
+        void OnDestroy()
+        {
+            if (m_subscribedClient != null)
+            {
+                m_subscribedClient.ShootReceived -= OnRemoteShootReceived;
+                m_subscribedClient.TransformReceived -= OnRemoteTransformReceived;
+                m_subscribedClient = null;
+            }
+        }
+
+        private void SubscribeClientEvents(LobbyClient client)
+        {
+            if (client == null || m_subscribedClient == client) return;
+            if (m_subscribedClient != null)
+            {
+                m_subscribedClient.ShootReceived -= OnRemoteShootReceived;
+                m_subscribedClient.TransformReceived -= OnRemoteTransformReceived;
+            }
+            m_subscribedClient = client;
+            m_subscribedClient.ShootReceived += OnRemoteShootReceived;
+            m_subscribedClient.TransformReceived += OnRemoteTransformReceived;
+        }
+
+        private void OnRemoteShootReceived(int shooterId, Vector3 pos, Vector3 dir)
+        {
+            if (shooterId == m_myObjectId) return; // Ya creamos nuestra bala localmente
+            CreateBulletGameObject(pos, dir);
+        }
+
+        private void OnRemoteTransformReceived(int objectId, Vector3 pos)
+        {
+            if (objectId == m_myObjectId) return;
+            LobbyClient client = LobbySession.Instance != null ? LobbySession.Instance.Client : null;
+            LinkingContext linking = GetLinkingContext(client);
+            if (linking == null) return;
+
+            GameObject obj = linking.Find(objectId);
+            if (obj != null)
+            {
+                obj.transform.position = pos;
+            }
+        }
+
+        private LinkingContext GetLinkingContext(LobbyClient client)
+        {
+            if (client != null)
+            {
+                LinkingContext lc = client.GetComponent<LinkingContext>();
+                if (lc != null) return lc;
+            }
+            return FindObjectOfType<LinkingContext>();
+        }
+
+        private ReplicationManagerClient GetReplicationClient(LobbyClient client)
+        {
+            if (client != null)
+            {
+                ReplicationManagerClient rc = client.GetComponent<ReplicationManagerClient>();
+                if (rc != null) return rc;
+            }
+            return FindObjectOfType<ReplicationManagerClient>();
+        }
+
         void Update()
         {
             if (LobbyGUI.NeedsSession()) return;
             LobbyClient client = LobbySession.Instance.Client;
-            LinkingContext linking = FindObjectOfType<LinkingContext>();
+            LinkingContext linking = GetLinkingContext(client);
 
             if (linking == null || client == null) return;
 

@@ -48,13 +48,10 @@ namespace Delivery3
                 bool kick = hosted != null && name != client.userName && GUILayout.Button("Kick", GUILayout.Width(70));
                 GUILayout.EndHorizontal();
 
-                PlayerDTO2 data;
-                
-
                 if (kick)
                 {
                     session.Server.Kick(hosted);
-                    break;   // the list just changed: stop drawing it this frame
+                    break;
                 }
             }
             GUILayout.FlexibleSpace();

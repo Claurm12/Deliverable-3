@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Delivery3.NetPlayer
   id: 0
-  type: 0
+  type: 1
   health: 100
   playerRole: Hunter
 --- !u!54 &1232980065427033529

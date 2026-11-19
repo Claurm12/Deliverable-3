@@ -10,7 +10,7 @@ namespace Delivery3
         public string serverName = "MyRoom";
         public int port = 9050;
         public int maxPlayers = 4;
-        public GameObject[] networkPrefabs;
+        public GameObject[] networkPrefabs; // 0 = Hunter, 1 = Chased
 
         public class Player
         {
@@ -108,7 +108,6 @@ namespace Delivery3
             }
 
             byte[] replicationPacket = m_replicationServer.WritePacket();
-            Debug.Log("[SERVER TICK] jugadores " + m_players.Count + " paquete " + (replicationPacket == null ? 0 : replicationPacket.Length) + " bytes");
             if (replicationPacket != null && replicationPacket.Length > 0)
             {
                 BroadcastCustomBytes(replicationPacket);
@@ -165,7 +164,7 @@ namespace Delivery3
             m_players.Add(new Player { connection = from, data = dto, lastSeen = Time.realtimeSinceStartup });
 
             int netId = NetObject.ComputeId(name);
-            EnsureServerObject(netId);
+            EnsureServerObject(netId, 0);
 
             if (m_replicationServer != null)
             {
@@ -176,19 +175,34 @@ namespace Delivery3
             SendRoomState();
         }
 
-        GameObject EnsureServerObject(int id)
+        GameObject EnsureServerObject(int id, int prefabType)
         {
-            GameObject go = m_linkingContext.Find(id);
-            if (go != null) return go;
-            if (networkPrefabs == null || networkPrefabs.Length == 0 || networkPrefabs[0] == null) return null;
+            if (networkPrefabs == null || networkPrefabs.Length == 0) return null;
+            int validType = (prefabType >= 0 && prefabType < networkPrefabs.Length && networkPrefabs[prefabType] != null) ? prefabType : 0;
+            if (networkPrefabs[validType] == null) return null;
 
-            go = Instantiate(networkPrefabs[0]);
-            go.name = "ServerPlayer_" + id;
+            GameObject go = m_linkingContext.Find(id);
+            Vector3 oldPos = Vector3.zero;
+            Quaternion oldRot = Quaternion.identity;
+
+            if (go != null)
+            {
+                NetObject existing = go.GetComponent<NetObject>();
+                if (existing != null && existing.type == validType) return go;
+
+                oldPos = go.transform.position;
+                oldRot = go.transform.rotation;
+                Destroy(go);
+                m_linkingContext.Unregister(id);
+            }
+
+            go = Instantiate(networkPrefabs[validType], oldPos, oldRot);
+            go.name = "ServerPlayer_" + id + "_Type" + validType;
 
             NetObject n = go.GetComponent<NetObject>();
             if (n == null) n = go.AddComponent<NetPlayer>();
             n.id = id;
-            n.type = 0;
+            n.type = (byte)validType;
 
             m_linkingContext.Register(go, id);
             return go;
@@ -197,10 +211,10 @@ namespace Delivery3
         void OnTransform(object from, Player player, int objectId, Vector3 pos)
         {
             if (player == null) return;
-            GameObject go = EnsureServerObject(objectId);
+            int prefabType = (player.data.playerRole == "Hunter") ? 0 : 1;
+            GameObject go = EnsureServerObject(objectId, prefabType);
             if (go != null) go.transform.position = pos;
             if (m_replicationServer != null) m_replicationServer.MarkUpdate(objectId);
-            Debug.Log("[SERVER] Transform id " + objectId + " pos " + pos + " prefabs: " + (networkPrefabs == null ? "null" : networkPrefabs.Length.ToString()));
         }
 
         void OnShoot(object from, Player player, int objectId, Vector3 pos, Vector3 dir)
@@ -230,9 +244,17 @@ namespace Delivery3
         {
             if (!m_players.Remove(player)) return;
 
+            int netId = NetObject.ComputeId(player.name);
+            GameObject go = m_linkingContext.Find(netId);
+            if (go != null)
+            {
+                Destroy(go);
+                m_linkingContext.Unregister(netId);
+            }
+
             if (m_replicationServer != null)
             {
-                m_replicationServer.MarkDestroy(NetObject.ComputeId(player.name));
+                m_replicationServer.MarkDestroy(netId);
             }
 
             Log("[SERVER] " + player.name + " " + reason);
@@ -262,28 +284,17 @@ namespace Delivery3
                     bool isHunter = (i == hunterIndex);
                     p.data.playerRole = isHunter ? "Hunter" : "Chased";
 
-                    // Ajusta 0 y 1 según el orden de tus prefabs en networkPrefabs
+                    // 0 = Hunter (Cazador), 1 = Chased (Que escapa)
                     int prefabType = isHunter ? 0 : 1;
-                    if (networkPrefabs == null || prefabType >= networkPrefabs.Length || networkPrefabs[prefabType] == null)
-                    {
-                        prefabType = 0;
-                    }
-
                     int netId = NetObject.ComputeId(p.name);
-                    GameObject go = m_linkingContext.Find(netId);
+
+                    GameObject go = EnsureServerObject(netId, prefabType);
                     if (go != null)
                     {
-                        NetObject netObj = go.GetComponent<NetObject>();
-                        if (netObj != null)
-                        {
-                            netObj.type = (byte)prefabType;
-                        }
-
                         NetPlayer netPlayerComp = go.GetComponent<NetPlayer>();
                         if (netPlayerComp != null)
                         {
                             netPlayerComp.playerRole = p.data.playerRole;
-                            netPlayerComp.type = (byte)prefabType;
                         }
 
                         if (m_replicationServer != null)

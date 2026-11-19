@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Delivery3.NetPlayer
   id: 0
-  type: 1
+  type: 0
   health: 100
   playerRole: Chased
 --- !u!136 &1609769423116128396
