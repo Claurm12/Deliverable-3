@@ -9,9 +9,18 @@ namespace Delivery3
         string m_port = "9050";
         int m_maxPlayers = 4;
         bool m_creating;
+        string m_localIp;
+
+        void Start()
+        {
+            m_localIp = LobbyServer.GetLocalHostIP();
+        }
 
         void OnGUI()
         {
+            if (string.IsNullOrEmpty(m_localIp))
+                m_localIp = LobbyServer.GetLocalHostIP();
+
             LobbySession session = LobbySession.Instance;
             LobbyGUI.Begin("CREATE GAME  (" + session.protocol + ")");
 
@@ -37,7 +46,7 @@ namespace Delivery3
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
-            GUILayout.Label("Others join with your IP (ipconfig) and port " + m_port);
+            GUILayout.Label("Others join with IP: " + m_localIp + "  and port: " + m_port);
             LobbyGUI.Message(session.message);
             LobbyGUI.End();
         }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using UnityEngine;
 
 namespace Delivery3
@@ -13,6 +15,8 @@ namespace Delivery3
 
         [Header("0 = Hunter | 1..N = Prefabs de Chased")]
         public GameObject[] networkPrefabs;
+
+        public string LocalHostIP { get; private set; } = "127.0.0.1";
 
         public class Player
         {
@@ -43,8 +47,44 @@ namespace Delivery3
         class ServerBullet { public int id; public string owner; public Vector3 velocity; public float dieAt; }
         readonly List<ServerBullet> m_bullets = new List<ServerBullet>();
 
+        public static string GetLocalHostIP()
+        {
+            try
+            {
+                using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+                {
+                    socket.Connect("8.8.8.8", 65530);
+                    IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                    if (endPoint != null && !IPAddress.IsLoopback(endPoint.Address))
+                    {
+                        return endPoint.Address.ToString();
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
+                string hostName = Dns.GetHostName();
+                IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
+                foreach (IPAddress ip in hostEntry.AddressList)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip))
+                    {
+                        return ip.ToString();
+                    }
+                }
+            }
+            catch { }
+
+            return "127.0.0.1";
+        }
+
         public virtual bool StartServer()
         {
+            LocalHostIP = GetLocalHostIP();
+            Log("[SERVER] IP Local: " + LocalHostIP + ":" + port);
+
             m_linkingContext = gameObject.GetComponent<LinkingContext>();
             if (m_linkingContext == null)
                 m_linkingContext = gameObject.AddComponent<LinkingContext>();
