@@ -12,7 +12,7 @@ namespace Delivery3
 
         public const float Speed = 12f;        
         public const float Lifetime = 2f;      
-        public const float Cooldown = 0.5f;    
+        public const float Cooldown = 2.0f;    
         public const int MaxAlivePerPlayer = 3; 
 
         // referencia para poder desregistrarla si el Destroy del servidor nunca llega.

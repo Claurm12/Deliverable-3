@@ -13,6 +13,7 @@ namespace Delivery3
 
         private Animator m_animator;
         private int m_lastAppliedShotCount = 0;
+        private bool m_initializedShotCount = false;
 
         void Awake()
         {
@@ -23,8 +24,12 @@ namespace Delivery3
         {
             shotCount++;
             m_lastAppliedShotCount = shotCount;
+            m_initializedShotCount = true;
             if (m_animator != null)
+            {
+                m_animator.ResetTrigger("Shoot");
                 m_animator.SetTrigger("Shoot");
+            }
         }
 
         public void ApplyAnimationState()
@@ -36,11 +41,29 @@ namespace Delivery3
             m_animator.SetBool("IsMoving", isMoving);
             m_animator.SetBool("IsDead", isDead);
 
-            if (shotCount > m_lastAppliedShotCount)
+            /*
+            if (!m_initializedShotCount)
             {
                 m_lastAppliedShotCount = shotCount;
-                m_animator.SetTrigger("Shoot");
+                m_initializedShotCount = true;
+                return;
             }
+
+            if (shotCount > m_lastAppliedShotCount)
+            {
+                int diff = shotCount - m_lastAppliedShotCount;
+                m_lastAppliedShotCount = shotCount;
+                if (!isDead && diff > 0)
+                {
+                    m_animator.ResetTrigger("Shoot");
+                    m_animator.SetTrigger("Shoot");
+                }
+            }
+            else if (shotCount < m_lastAppliedShotCount)
+            {
+                m_lastAppliedShotCount = shotCount;
+            }
+            */
         }
 
         public override void Write(BinaryWriter writer)
