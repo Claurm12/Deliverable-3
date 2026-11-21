@@ -18,7 +18,7 @@ namespace Delivery3
             public PlayerDTO2 data;
             public int pingMs = -1;
             public float lastSeen;
-            public float nextShotTime;   
+            public float nextShotTime;
             public string name { get { return data.playerName; } }
         }
 
@@ -223,8 +223,14 @@ namespace Delivery3
             if (player == null) return;
             int prefabType = (player.data.playerRole == "Hunter") ? 0 : 1;
             GameObject go = EnsureServerObject(objectId, prefabType);
-            if (go != null) 
-            { 
+            if (go != null)
+            {
+                NetPlayer np = go.GetComponent<NetPlayer>();
+                if (np != null)
+                {
+                    np.isMoving = (go.transform.position - pos).sqrMagnitude > 0.0001f;
+                }
+
                 go.transform.position = pos;
                 go.transform.rotation = Quaternion.Euler(0f, rotY, 0f);
             }
@@ -271,7 +277,32 @@ namespace Delivery3
 
             m_bullets.Add(new ServerBullet { id = id, owner = player.name, dieAt = now + NetBullet.Lifetime });
             m_replicationServer.MarkCreate(id);
+
+            if (shooter != null)
+            {
+                NetPlayer np = shooter.GetComponent<NetPlayer>();
+                if (np != null)
+                {
+                    np.shotCount++;
+                    m_replicationServer.MarkUpdate(objectId);
+                }
+            }
+
             return true;
+        }
+
+        public void SetPlayerDead(int netId, bool dead)
+        {
+            GameObject go = m_linkingContext.Find(netId);
+            if (go == null) return;
+
+            NetPlayer np = go.GetComponent<NetPlayer>();
+            if (np != null && np.isDead != dead)
+            {
+                np.isDead = dead;
+                if (dead) np.isMoving = false;
+                if (m_replicationServer != null) m_replicationServer.MarkUpdate(netId);
+            }
         }
 
         void ExpireBullets()
@@ -361,6 +392,8 @@ namespace Delivery3
                         if (netPlayerComp != null)
                         {
                             netPlayerComp.playerRole = p.data.playerRole;
+                            netPlayerComp.isDead = false;
+                            netPlayerComp.isMoving = false;
                         }
 
                         if (m_replicationServer != null)

@@ -71,19 +71,31 @@ namespace Delivery3
                 NetObject target = go.GetComponent<NetObject>();
                 Vector3 keepPos = go.transform.position;
                 Quaternion keepRot = go.transform.rotation;
+
+                NetPlayer netPlayer = target as NetPlayer;
+                bool keepIsMoving = netPlayer != null && netPlayer.isMoving;
+                int keepShotCount = netPlayer != null ? netPlayer.shotCount : 0;
+
                 target.Read(reader);
 
                 if (id == m_localId)
                 {
                     go.transform.position = keepPos;
                     go.transform.rotation = keepRot;
+
+                    if (netPlayer != null)
+                    {
+                        netPlayer.isMoving = keepIsMoving;
+                        netPlayer.shotCount = keepShotCount;
+                        netPlayer.ApplyAnimationState();
+                    }
                 }
             }
         }
 
         private GameObject InstantiatePrefab(int id, byte type)
         {
-            //creacion balas
+            // creacion balas
             if (type == NetBullet.TypeId)
             {
                 NetBullet bullet = NetBullet.CreateVisual(Vector3.zero, 0f);

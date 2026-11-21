@@ -7,8 +7,9 @@ namespace Delivery3
         public int objectId;
 
         private Rigidbody m_rb;
+        private NetPlayer m_netPlayer;
         private float m_sendTimer;
-        private float m_nextShotTime;   
+        private float m_nextShotTime;
         private float m_verticalVelocity = 0f;
         private const float m_gravity = -20f;
         private const float m_jumpForce = 8f;
@@ -16,6 +17,7 @@ namespace Delivery3
         void Start()
         {
             m_rb = GetComponent<Rigidbody>();
+            m_netPlayer = GetComponent<NetPlayer>();
         }
 
         void Update()
@@ -60,6 +62,9 @@ namespace Delivery3
                 {
                     m_nextShotTime = Time.time + NetBullet.Cooldown;
 
+                    if (m_netPlayer != null)
+                        m_netPlayer.TriggerShootAnimation();
+
                     Vector3 spawnPos = transform.position + transform.forward * 0.8f;
                     Vector3 shootDir = transform.forward;
 
@@ -86,6 +91,14 @@ namespace Delivery3
             if (GameUI.MoveD) h += 1f;
 
             Vector3 direction = new Vector3(h, 0, v);
+            bool moving = direction.magnitude > 0.1f;
+
+            if (m_netPlayer != null && m_netPlayer.isMoving != moving)
+            {
+                m_netPlayer.isMoving = moving;
+                m_netPlayer.ApplyAnimationState();
+            }
+
             Vector3 currentPos = (m_rb != null) ? m_rb.position : transform.position;
 
             // Gestión del salto
@@ -107,7 +120,7 @@ namespace Delivery3
                 }
             }
 
-            if (direction.magnitude > 0.1f)
+            if (moving)
             {
                 Vector3 moveDir = direction.normalized;
                 currentPos += moveDir * moveSpeed * Time.fixedDeltaTime;

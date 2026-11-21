@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9514194, guid: aa05473e4d04e834eb7a29b53251c8cf, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 43be405b123e55543ad3df22200462ec, type: 2}
     - target: {fileID: 715141455031618802, guid: aa05473e4d04e834eb7a29b53251c8cf, type: 3}
       propertyPath: m_ProvidesContacts
       value: 0
@@ -101,6 +105,9 @@ MonoBehaviour:
   type: 1
   health: 100
   playerRole: Hunter
+  isMoving: 0
+  isDead: 0
+  shotCount: 0
 --- !u!54 &1232980065427033529
 Rigidbody:
   m_ObjectHideFlags: 0
