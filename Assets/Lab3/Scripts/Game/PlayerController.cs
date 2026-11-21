@@ -8,6 +8,7 @@ namespace Delivery3
 
         private Rigidbody m_rb;
         private float m_sendTimer;
+        private float m_nextShotTime;   
         private float m_verticalVelocity = 0f;
         private const float m_gravity = -20f;
         private const float m_jumpForce = 8f;
@@ -51,8 +52,14 @@ namespace Delivery3
                     currentRole = data.playerRole;
                 }
 
-                if (currentRole == "Hunter")
+                if (currentRole == "Hunter" && Time.time < m_nextShotTime)
                 {
+                    // bala en cooldown
+                }
+                else if (currentRole == "Hunter")
+                {
+                    m_nextShotTime = Time.time + NetBullet.Cooldown;
+
                     Vector3 spawnPos = transform.position + transform.forward * 0.8f;
                     Vector3 shootDir = transform.forward;
 
@@ -81,7 +88,7 @@ namespace Delivery3
             Vector3 direction = new Vector3(h, 0, v);
             Vector3 currentPos = (m_rb != null) ? m_rb.position : transform.position;
 
-            // Gestión del salto
+            // GestiÃ³n del salto
             if (GameUI.JumpRequested && currentPos.y <= 0.51f)
             {
                 m_verticalVelocity = m_jumpForce;
@@ -105,7 +112,7 @@ namespace Delivery3
                 Vector3 moveDir = direction.normalized;
                 currentPos += moveDir * moveSpeed * Time.fixedDeltaTime;
 
-                // Girar suavemente hacia la dirección en la que nos movemos
+                // Girar suavemente hacia la direcciÃ³n en la que nos movemos
                 Quaternion targetRotation = Quaternion.LookRotation(moveDir);
                 if (m_rb != null)
                 {
@@ -117,7 +124,7 @@ namespace Delivery3
                 }
             }
 
-            // Aplicar movimiento físico y frenar rebotes residuales
+            // Aplicar movimiento fÃ­sico y frenar rebotes residuales
             if (m_rb != null)
             {
                 m_rb.linearVelocity = Vector3.zero;

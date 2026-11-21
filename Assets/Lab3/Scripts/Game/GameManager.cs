@@ -89,7 +89,6 @@ namespace Delivery3
         {
             if (m_subscribedClient != null)
             {
-                m_subscribedClient.ShootReceived -= OnRemoteShootReceived;
                 m_subscribedClient.TransformReceived -= OnRemoteTransformReceived;
                 m_subscribedClient = null;
             }
@@ -100,18 +99,10 @@ namespace Delivery3
             if (client == null || m_subscribedClient == client) return;
             if (m_subscribedClient != null)
             {
-                m_subscribedClient.ShootReceived -= OnRemoteShootReceived;
                 m_subscribedClient.TransformReceived -= OnRemoteTransformReceived;
             }
             m_subscribedClient = client;
-            m_subscribedClient.ShootReceived += OnRemoteShootReceived;
             m_subscribedClient.TransformReceived += OnRemoteTransformReceived;
-        }
-
-        private void OnRemoteShootReceived(int shooterId, Vector3 pos, Vector3 dir)
-        {
-            if (shooterId == m_myObjectId) return; // Ya creamos nuestra bala localmente
-            CreateBulletGameObject(pos, dir);
         }
 
         private void OnRemoteTransformReceived(int objectId, Vector3 pos, float rotY)
@@ -226,50 +217,14 @@ namespace Delivery3
 
         public void SpawnAndSendBullet(LobbySession session, LobbyClient client, int objectId, Vector3 pos, Vector3 dir)
         {
-            CreateBulletGameObject(pos, dir);
-
-            byte[] packet = Messages.Shoot(objectId, pos, dir);
             if (session.IsHost)
             {
-                session.Server.BroadcastCustomBytes(packet);
+                session.Server.ShootFromHost(objectId, pos, dir);
             }
             else
             {
-                client.SendCustomBytes(packet);
+                client.SendCustomBytes(Messages.Shoot(objectId, pos, dir));
             }
-        }
-
-        public void CreateBulletGameObject(Vector3 pos, Vector3 dir)
-        {
-            GameObject bullet = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            bullet.transform.position = pos;
-            bullet.transform.localScale = Vector3.one * 0.4f;
-            BulletMover mover = bullet.AddComponent<BulletMover>();
-            mover.SetDirection(dir);
-        }
-    }
-
-    public class BulletMover : MonoBehaviour
-    {
-        private Vector3 m_direction = Vector3.forward;
-        private float m_speed = 12f;
-
-        public void SetDirection(Vector3 dir)
-        {
-            if (dir.sqrMagnitude > 0.001f)
-            {
-                m_direction = dir.normalized;
-            }
-        }
-
-        void Start()
-        {
-            Destroy(gameObject, 3.0f);
-        }
-
-        void Update()
-        {
-            transform.position += m_direction * m_speed * Time.deltaTime;
         }
     }
 }

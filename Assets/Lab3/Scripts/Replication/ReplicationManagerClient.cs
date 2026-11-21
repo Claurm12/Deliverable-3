@@ -83,6 +83,16 @@ namespace Delivery3
 
         private GameObject InstantiatePrefab(int id, byte type)
         {
+            //creacion balas
+            if (type == NetBullet.TypeId)
+            {
+                NetBullet bullet = NetBullet.CreateVisual(Vector3.zero, 0f);
+                bullet.id = id;
+                bullet.replicaLinking = m_linking;
+                m_linking.Register(bullet.gameObject, id);
+                return bullet.gameObject;
+            }
+
             if (m_prefabs == null || m_prefabs.Count == 0)
             {
                 Debug.LogError("[REPL CLIENT] No hay prefabs configurados.");

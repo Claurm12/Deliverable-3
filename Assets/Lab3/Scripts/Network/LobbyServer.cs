@@ -18,6 +18,7 @@ namespace Delivery3
             public PlayerDTO2 data;
             public int pingMs = -1;
             public float lastSeen;
+            public float nextShotTime;   
             public string name { get { return data.playerName; } }
         }
 
@@ -34,6 +35,9 @@ namespace Delivery3
         protected LinkingContext m_linkingContext;
         private float m_tickTimer;
         private const float ServerTickRate = 0.05f;
+
+        class ServerBullet { public int id; public string owner; public float dieAt; }
+        readonly List<ServerBullet> m_bullets = new List<ServerBullet>();
 
         public virtual bool StartServer()
         {
@@ -88,6 +92,8 @@ namespace Delivery3
 
             if (Started)
             {
+                ExpireBullets();
+
                 m_tickTimer += Time.deltaTime;
                 if (m_tickTimer >= ServerTickRate)
                 {
@@ -107,6 +113,9 @@ namespace Delivery3
                 if (m_linkingContext.Find(netId) != null)
                     m_replicationServer.MarkUpdate(netId);
             }
+
+            foreach (ServerBullet b in m_bullets)
+                m_replicationServer.MarkUpdate(b.id);
 
             byte[] replicationPacket = m_replicationServer.WritePacket();
             if (replicationPacket != null && replicationPacket.Length > 0)
@@ -225,11 +234,63 @@ namespace Delivery3
         void OnShoot(object from, Player player, int objectId, Vector3 pos, Vector3 dir)
         {
             if (player == null) return;
-            byte[] shootPacket = Messages.Shoot(objectId, pos, dir);
+            TrySpawnBullet(player, objectId, pos, dir);
+        }
+
+        public void ShootFromHost(int objectId, Vector3 pos, Vector3 dir)
+        {
             foreach (Player p in m_players)
+                if (NetObject.ComputeId(p.name) == objectId) { TrySpawnBullet(p, objectId, pos, dir); return; }
+        }
+
+        bool TrySpawnBullet(Player player, int objectId, Vector3 pos, Vector3 dir)
+        {
+            if (!Started || m_replicationServer == null) return false;
+
+            if (objectId != NetObject.ComputeId(player.name)) return false;
+            if (player.data.playerRole != "Hunter") return false;
+
+            float now = Time.time;
+            if (now < player.nextShotTime) return false;
+            int alive = 0;
+            foreach (ServerBullet b in m_bullets) if (b.owner == player.name) alive++;
+            if (alive >= NetBullet.MaxAlivePerPlayer) return false;
+
+            dir.y = 0f;
+            if (dir.sqrMagnitude < 0.0001f) return false;
+            dir.Normalize();
+
+            GameObject shooter = m_linkingContext.Find(objectId);
+            if (shooter != null) pos = shooter.transform.position + dir * 0.8f;
+
+            player.nextShotTime = now + NetBullet.Cooldown * 0.8f;
+
+            NetBullet bullet = NetBullet.CreateVisual(pos, Quaternion.LookRotation(dir).eulerAngles.y);
+            int id = m_linkingContext.Register(bullet.gameObject);
+            bullet.id = id;
+
+            m_bullets.Add(new ServerBullet { id = id, owner = player.name, dieAt = now + NetBullet.Lifetime });
+            m_replicationServer.MarkCreate(id);
+            return true;
+        }
+
+        void ExpireBullets()
+        {
+            float now = Time.time;
+            for (int i = m_bullets.Count - 1; i >= 0; i--)
             {
-                Send(p.connection, shootPacket);
+                if (now < m_bullets[i].dieAt) continue;
+                DestroyBullet(m_bullets[i].id);
+                m_bullets.RemoveAt(i);
             }
+        }
+
+        void DestroyBullet(int id)
+        {
+            GameObject go = m_linkingContext.Find(id);
+            if (go != null) Destroy(go);
+            m_linkingContext.Unregister(id);
+            if (m_replicationServer != null) m_replicationServer.MarkDestroy(id);
         }
 
         void Refuse(object to, string reason)
@@ -358,7 +419,13 @@ namespace Delivery3
             return null;
         }
 
-        protected void ClearPlayers() { m_players.Clear(); Started = false; }
+        protected void ClearPlayers()
+        {
+            foreach (ServerBullet b in m_bullets) DestroyBullet(b.id);
+            m_bullets.Clear();
+            m_players.Clear();
+            Started = false;
+        }
 
         protected void Log(string message) { LobbySession.Log(message); }
 
