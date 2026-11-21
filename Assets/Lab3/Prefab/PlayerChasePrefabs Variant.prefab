@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7447163605599512414, guid: 907fd825e3988774caab4234b943bf44, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 93b352991e0674549bdc43f9d85dcbb6, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -87,6 +91,9 @@ MonoBehaviour:
   type: 0
   health: 100
   playerRole: Chased
+  isMoving: 0
+  isDead: 0
+  shotCount: 0
 --- !u!136 &1609769423116128396
 CapsuleCollider:
   m_ObjectHideFlags: 0
