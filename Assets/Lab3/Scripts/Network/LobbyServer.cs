@@ -32,6 +32,7 @@ namespace Delivery3
 
         public IList<Player> Players { get { return m_players.AsReadOnly(); } }
         public bool Started { get; private set; }
+        public bool MatchEnded { get; private set; }
         public abstract bool IsRunning { get; }
 
         protected ReplicationManagerServer m_replicationServer;
@@ -238,7 +239,7 @@ namespace Delivery3
 
         void OnTransform(object from, Player player, int objectId, Vector3 pos, float rotY)
         {
-            if (player == null) return;
+            if (player == null || MatchEnded) return;
             int prefabType = (player.data.playerRole == "Hunter") ? 0 : player.assignedPrefabType;
             GameObject go = EnsureServerObject(objectId, prefabType);
             if (go != null)
@@ -258,19 +259,20 @@ namespace Delivery3
 
         void OnShoot(object from, Player player, int objectId, Vector3 pos, Vector3 dir)
         {
-            if (player == null) return;
+            if (player == null || MatchEnded) return;
             TrySpawnBullet(player, objectId, pos, dir);
         }
 
         public void ShootFromHost(int objectId, Vector3 pos, Vector3 dir)
         {
+            if (MatchEnded) return;
             foreach (Player p in m_players)
                 if (NetObject.ComputeId(p.name) == objectId) { TrySpawnBullet(p, objectId, pos, dir); return; }
         }
 
         bool TrySpawnBullet(Player player, int objectId, Vector3 pos, Vector3 dir)
         {
-            if (!Started || m_replicationServer == null) return false;
+            if (!Started || MatchEnded || m_replicationServer == null) return false;
 
             if (objectId != NetObject.ComputeId(player.name)) return false;
             if (player.data.playerRole != "Hunter") return false;
@@ -317,6 +319,8 @@ namespace Delivery3
 
         public void OnHunterHitNpc(string hunterName)
         {
+            if (!Started || MatchEnded) return;
+
             Player hunterPlayer = FindByName(hunterName);
             if (hunterPlayer == null || hunterPlayer.data.playerRole != "Hunter") return;
 
@@ -349,6 +353,49 @@ namespace Delivery3
                 np.isDead = dead;
                 if (dead) np.isMoving = false;
                 if (m_replicationServer != null) m_replicationServer.MarkUpdate(netId);
+                CheckWinLoseCondition();
+            }
+        }
+
+        void CheckWinLoseCondition()
+        {
+            if (!Started || MatchEnded) return;
+
+            int totalChased = 0;
+            int aliveChased = 0;
+            bool anyHunterAlive = false;
+            bool anyHunterExists = false;
+
+            foreach (Player p in m_players)
+            {
+                int netId = NetObject.ComputeId(p.name);
+                GameObject go = m_linkingContext.Find(netId);
+                NetPlayer np = go != null ? go.GetComponent<NetPlayer>() : null;
+                bool isDead = np != null && np.isDead;
+
+                if (p.data.playerRole == "Hunter")
+                {
+                    anyHunterExists = true;
+                    if (!isDead) anyHunterAlive = true;
+                }
+                else if (p.data.playerRole == "Chased")
+                {
+                    totalChased++;
+                    if (!isDead) aliveChased++;
+                }
+            }
+
+            if (anyHunterExists && !anyHunterAlive)
+            {
+                MatchEnded = true;
+                Log("[GAME] El cazador se ha quedado sin vidas. Ganan los Chased.");
+                Broadcast("CHAT:* Fin de partida: el cazador ha perdido. ¡Ganan los que escapan!");
+            }
+            else if (totalChased > 0 && aliveChased == 0)
+            {
+                MatchEnded = true;
+                Log("[GAME] Todos los Chased eliminados. Gana el Hunter.");
+                Broadcast("CHAT:* Fin de partida: ¡gana el cazador!");
             }
         }
 
@@ -459,6 +506,11 @@ namespace Delivery3
             Log("[SERVER] " + player.name + " " + reason);
             BroadcastSystem(player.name + " " + reason);
             SendRoomState();
+
+            if (Started && !MatchEnded)
+            {
+                CheckWinLoseCondition();
+            }
         }
 
         public void Kick(Player player)
@@ -473,6 +525,8 @@ namespace Delivery3
         {
             if (Started) return;
 
+            MatchEnded = false;
+
             if (m_players.Count > 0)
             {
                 int hunterIndex = UnityEngine.Random.Range(0, m_players.Count);
@@ -483,7 +537,6 @@ namespace Delivery3
                     bool isHunter = (i == hunterIndex);
                     p.data.playerRole = isHunter ? "Hunter" : "Chased";
 
-                    // 0 = Hunter, 1..N = prefabs aleatorios de Chased
                     int prefabType = isHunter ? 0 : GetRandomChasedPrefabType();
                     p.assignedPrefabType = prefabType;
 
@@ -564,6 +617,7 @@ namespace Delivery3
             m_bullets.Clear();
             m_players.Clear();
             Started = false;
+            MatchEnded = false;
         }
 
         protected void Log(string message) { LobbySession.Log(message); }
