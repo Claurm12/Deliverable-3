@@ -14,10 +14,16 @@ namespace Delivery3
         private Animator m_animator;
         private int m_lastAppliedShotCount = 0;
         private bool m_initializedShotCount = false;
+        private bool m_isLocalPlayer = false;
 
         void Awake()
         {
             m_animator = GetComponentInChildren<Animator>();
+        }
+
+        public void SetIsLocalPlayer(bool isLocal)
+        {
+            m_isLocalPlayer = isLocal;
         }
 
         public void TriggerShootAnimation()
@@ -25,7 +31,7 @@ namespace Delivery3
             shotCount++;
             m_lastAppliedShotCount = shotCount;
             m_initializedShotCount = true;
-            if (m_animator != null)
+            if (m_animator != null && !isDead)
             {
                 m_animator.ResetTrigger("Shoot");
                 m_animator.SetTrigger("Shoot");
@@ -41,7 +47,6 @@ namespace Delivery3
             m_animator.SetBool("IsMoving", isMoving);
             m_animator.SetBool("IsDead", isDead);
 
-            /*
             if (!m_initializedShotCount)
             {
                 m_lastAppliedShotCount = shotCount;
@@ -49,21 +54,19 @@ namespace Delivery3
                 return;
             }
 
-            if (shotCount > m_lastAppliedShotCount)
+            if (!m_isLocalPlayer && shotCount > m_lastAppliedShotCount)
             {
-                int diff = shotCount - m_lastAppliedShotCount;
                 m_lastAppliedShotCount = shotCount;
-                if (!isDead && diff > 0)
+                if (!isDead)
                 {
                     m_animator.ResetTrigger("Shoot");
                     m_animator.SetTrigger("Shoot");
                 }
             }
-            else if (shotCount < m_lastAppliedShotCount)
+            else if (shotCount != m_lastAppliedShotCount)
             {
                 m_lastAppliedShotCount = shotCount;
             }
-            */
         }
 
         public override void Write(BinaryWriter writer)

@@ -6,17 +6,27 @@ namespace Delivery3
 {
     public class ReplicationManagerClient : MonoBehaviour
     {
-        [SerializeField] List<GameObject> m_prefabs = new List<GameObject>();   // 0 = Hunter, 1 = Chased
+        [Header("0 = Hunter | 1..N = Prefabs de Chased (mismo orden que LobbyServer)")]
+        [SerializeField] List<GameObject> m_prefabs = new List<GameObject>();
         LinkingContext m_linking;
         int m_lastSequence = -1;
         int m_localId;
 
-        public void SetLocalId(int id) { m_localId = id; }
+        public void SetLocalId(int id)
+        {
+            m_localId = id;
+            if (m_linking != null)
+            {
+                GameObject localGo = m_linking.Find(m_localId);
+                NetPlayer localNp = localGo != null ? localGo.GetComponent<NetPlayer>() : null;
+                if (localNp != null) localNp.SetIsLocalPlayer(true);
+            }
+        }
 
         public void Init(LinkingContext linking, List<GameObject> prefabs = null)
         {
             m_linking = linking;
-            if (prefabs != null) m_prefabs = prefabs;
+            if (prefabs != null && prefabs.Count > 0) m_prefabs = prefabs;
         }
 
         public void ReadPacket(BinaryReader reader)
@@ -69,10 +79,17 @@ namespace Delivery3
                 }
 
                 NetObject target = go.GetComponent<NetObject>();
+                if (target == null) continue;
+
                 Vector3 keepPos = go.transform.position;
                 Quaternion keepRot = go.transform.rotation;
 
                 NetPlayer netPlayer = target as NetPlayer;
+                if (netPlayer != null)
+                {
+                    netPlayer.SetIsLocalPlayer(id == m_localId);
+                }
+
                 bool keepIsMoving = netPlayer != null && netPlayer.isMoving;
                 int keepShotCount = netPlayer != null ? netPlayer.shotCount : 0;
 
@@ -95,7 +112,6 @@ namespace Delivery3
 
         private GameObject InstantiatePrefab(int id, byte type)
         {
-            // creacion balas
             if (type == NetBullet.TypeId)
             {
                 NetBullet bullet = NetBullet.CreateVisual(Vector3.zero, 0f);
@@ -117,6 +133,10 @@ namespace Delivery3
             if (no == null) no = go.AddComponent<NetPlayer>();
             no.id = id;
             no.type = (byte)index;
+
+            NetPlayer np = no as NetPlayer;
+            if (np != null) np.SetIsLocalPlayer(id == m_localId);
+
             m_linking.Register(go, id);
             return go;
         }

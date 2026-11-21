@@ -10,7 +10,9 @@ namespace Delivery3
         public string serverName = "MyRoom";
         public int port = 9050;
         public int maxPlayers = 4;
-        public GameObject[] networkPrefabs; // 0 = Hunter, 1 = Chased
+
+        [Header("0 = Hunter | 1..N = Prefabs de Chased")]
+        public GameObject[] networkPrefabs;
 
         public class Player
         {
@@ -19,6 +21,7 @@ namespace Delivery3
             public int pingMs = -1;
             public float lastSeen;
             public float nextShotTime;
+            public int assignedPrefabType = 1;
             public string name { get { return data.playerName; } }
         }
 
@@ -171,7 +174,14 @@ namespace Delivery3
             if (m_players.Count >= maxPlayers) { Refuse(from, "The room is full (" + maxPlayers + "/" + maxPlayers + ")"); return; }
             if (FindByName(name) != null) { Refuse(from, "The name " + name + " is already taken"); return; }
 
-            m_players.Add(new Player { connection = from, data = dto, lastSeen = Time.realtimeSinceStartup });
+            Player newPlayer = new Player
+            {
+                connection = from,
+                data = dto,
+                lastSeen = Time.realtimeSinceStartup,
+                assignedPrefabType = 0
+            };
+            m_players.Add(newPlayer);
 
             int netId = NetObject.ComputeId(name);
             EnsureServerObject(netId, 0);
@@ -183,6 +193,14 @@ namespace Delivery3
 
             BroadcastSystem(name + " joined");
             SendRoomState();
+        }
+
+        int GetRandomChasedPrefabType()
+        {
+            if (networkPrefabs == null || networkPrefabs.Length <= 1)
+                return 0;
+
+            return UnityEngine.Random.Range(1, networkPrefabs.Length);
         }
 
         GameObject EnsureServerObject(int id, int prefabType)
@@ -221,7 +239,7 @@ namespace Delivery3
         void OnTransform(object from, Player player, int objectId, Vector3 pos, float rotY)
         {
             if (player == null) return;
-            int prefabType = (player.data.playerRole == "Hunter") ? 0 : 1;
+            int prefabType = (player.data.playerRole == "Hunter") ? 0 : player.assignedPrefabType;
             GameObject go = EnsureServerObject(objectId, prefabType);
             if (go != null)
             {
@@ -465,10 +483,11 @@ namespace Delivery3
                     bool isHunter = (i == hunterIndex);
                     p.data.playerRole = isHunter ? "Hunter" : "Chased";
 
-                    // 0 = Hunter (Cazador), 1 = Chased (Que escapa)
-                    int prefabType = isHunter ? 0 : 1;
-                    int netId = NetObject.ComputeId(p.name);
+                    // 0 = Hunter, 1..N = prefabs aleatorios de Chased
+                    int prefabType = isHunter ? 0 : GetRandomChasedPrefabType();
+                    p.assignedPrefabType = prefabType;
 
+                    int netId = NetObject.ComputeId(p.name);
                     GameObject go = EnsureServerObject(netId, prefabType);
                     if (go != null)
                     {
@@ -479,10 +498,12 @@ namespace Delivery3
                             netPlayerComp.health = isHunter ? 3 : 1;
                             netPlayerComp.isDead = false;
                             netPlayerComp.isMoving = false;
+                            netPlayerComp.ApplyAnimationState();
                         }
 
                         if (m_replicationServer != null)
                         {
+                            m_replicationServer.MarkCreate(netId);
                             m_replicationServer.MarkUpdate(netId);
                         }
                     }

@@ -300,6 +300,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3904295990803084440, guid: 79cf6cc1e15a2c446b498fe5f0410089, type: 3}
+      propertyPath: networkPrefabs.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3904295990803084440, guid: 79cf6cc1e15a2c446b498fe5f0410089, type: 3}
       propertyPath: 'networkPrefabs.Array.data[0]'
       value: 
       objectReference: {fileID: 4416811643739159606, guid: 47c6927792cd6c2408018098f5959058, type: 3}
@@ -307,6 +311,14 @@ PrefabInstance:
       propertyPath: 'networkPrefabs.Array.data[1]'
       value: 
       objectReference: {fileID: 6865077000556583477, guid: 16ac6cf2ccc273d40a3b6b4f1d172cb6, type: 3}
+    - target: {fileID: 3904295990803084440, guid: 79cf6cc1e15a2c446b498fe5f0410089, type: 3}
+      propertyPath: 'networkPrefabs.Array.data[2]'
+      value: 
+      objectReference: {fileID: 6252356961377389083, guid: 2db03e7c8a8135146b280e5da7e0289c, type: 3}
+    - target: {fileID: 3904295990803084440, guid: 79cf6cc1e15a2c446b498fe5f0410089, type: 3}
+      propertyPath: 'networkPrefabs.Array.data[3]'
+      value: 
+      objectReference: {fileID: 7478225697116208144, guid: 6fb37f825ee63264b9c2600bf1a52006, type: 3}
     - target: {fileID: 7288640240393544682, guid: 79cf6cc1e15a2c446b498fe5f0410089, type: 3}
       propertyPath: m_Name
       value: LobbySession
