@@ -89,7 +89,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Delivery3.NetPlayer
   id: 0
   type: 0
-  health: 100
+  health: 1
   playerRole: Chased
   isMoving: 0
   isDead: 0

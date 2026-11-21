@@ -36,7 +36,7 @@ namespace Delivery3
         private float m_tickTimer;
         private const float ServerTickRate = 0.05f;
 
-        class ServerBullet { public int id; public string owner; public float dieAt; }
+        class ServerBullet { public int id; public string owner; public Vector3 velocity; public float dieAt; }
         readonly List<ServerBullet> m_bullets = new List<ServerBullet>();
 
         public virtual bool StartServer()
@@ -92,7 +92,7 @@ namespace Delivery3
 
             if (Started)
             {
-                ExpireBullets();
+                UpdateBullets();
 
                 m_tickTimer += Time.deltaTime;
                 if (m_tickTimer >= ServerTickRate)
@@ -228,6 +228,7 @@ namespace Delivery3
                 NetPlayer np = go.GetComponent<NetPlayer>();
                 if (np != null)
                 {
+                    if (np.isDead) return;
                     np.isMoving = (go.transform.position - pos).sqrMagnitude > 0.0001f;
                 }
 
@@ -256,6 +257,10 @@ namespace Delivery3
             if (objectId != NetObject.ComputeId(player.name)) return false;
             if (player.data.playerRole != "Hunter") return false;
 
+            GameObject shooter = m_linkingContext.Find(objectId);
+            NetPlayer shooterNetPlayer = shooter != null ? shooter.GetComponent<NetPlayer>() : null;
+            if (shooterNetPlayer != null && shooterNetPlayer.isDead) return false;
+
             float now = Time.time;
             if (now < player.nextShotTime) return false;
             int alive = 0;
@@ -266,7 +271,6 @@ namespace Delivery3
             if (dir.sqrMagnitude < 0.0001f) return false;
             dir.Normalize();
 
-            GameObject shooter = m_linkingContext.Find(objectId);
             if (shooter != null) pos = shooter.transform.position + dir * 0.8f;
 
             player.nextShotTime = now + NetBullet.Cooldown * 0.8f;
@@ -275,20 +279,45 @@ namespace Delivery3
             int id = m_linkingContext.Register(bullet.gameObject);
             bullet.id = id;
 
-            m_bullets.Add(new ServerBullet { id = id, owner = player.name, dieAt = now + NetBullet.Lifetime });
+            m_bullets.Add(new ServerBullet
+            {
+                id = id,
+                owner = player.name,
+                velocity = dir * NetBullet.Speed,
+                dieAt = now + NetBullet.Lifetime
+            });
             m_replicationServer.MarkCreate(id);
 
-            if (shooter != null)
+            if (shooterNetPlayer != null)
             {
-                NetPlayer np = shooter.GetComponent<NetPlayer>();
-                if (np != null)
-                {
-                    np.shotCount++;
-                    m_replicationServer.MarkUpdate(objectId);
-                }
+                shooterNetPlayer.shotCount++;
+                m_replicationServer.MarkUpdate(objectId);
             }
 
             return true;
+        }
+
+        public void OnHunterHitNpc(string hunterName)
+        {
+            Player hunterPlayer = FindByName(hunterName);
+            if (hunterPlayer == null || hunterPlayer.data.playerRole != "Hunter") return;
+
+            int hunterId = NetObject.ComputeId(hunterPlayer.name);
+            GameObject go = m_linkingContext.Find(hunterId);
+            if (go == null) return;
+
+            NetPlayer np = go.GetComponent<NetPlayer>();
+            if (np == null || np.isDead) return;
+
+            np.health = Mathf.Max(0, np.health - 1);
+            if (np.health <= 0)
+            {
+                SetPlayerDead(hunterId, true);
+            }
+            else if (m_replicationServer != null)
+            {
+                m_replicationServer.MarkUpdate(hunterId);
+            }
         }
 
         public void SetPlayerDead(int netId, bool dead)
@@ -305,14 +334,69 @@ namespace Delivery3
             }
         }
 
-        void ExpireBullets()
+        void UpdateBullets()
         {
             float now = Time.time;
+            float dt = Time.deltaTime;
+            const float hitRadiusSq = 1.0f * 1.0f;
+
             for (int i = m_bullets.Count - 1; i >= 0; i--)
             {
-                if (now < m_bullets[i].dieAt) continue;
-                DestroyBullet(m_bullets[i].id);
-                m_bullets.RemoveAt(i);
+                ServerBullet b = m_bullets[i];
+                if (now >= b.dieAt)
+                {
+                    DestroyBullet(b.id);
+                    m_bullets.RemoveAt(i);
+                    continue;
+                }
+
+                GameObject bulletGo = m_linkingContext.Find(b.id);
+                if (bulletGo == null)
+                {
+                    m_bullets.RemoveAt(i);
+                    continue;
+                }
+
+                bulletGo.transform.position += b.velocity * dt;
+                Vector3 bulletPos = bulletGo.transform.position;
+
+                bool hitTarget = false;
+                foreach (Player targetPlayer in m_players)
+                {
+                    if (targetPlayer.name == b.owner) continue;
+                    if (targetPlayer.data.playerRole != "Chased") continue;
+
+                    int targetId = NetObject.ComputeId(targetPlayer.name);
+                    GameObject targetGo = m_linkingContext.Find(targetId);
+                    if (targetGo == null) continue;
+
+                    NetPlayer targetNetPlayer = targetGo.GetComponent<NetPlayer>();
+                    if (targetNetPlayer == null || targetNetPlayer.isDead) continue;
+
+                    Vector3 delta = targetGo.transform.position - bulletPos;
+                    delta.y = 0f;
+                    if (delta.sqrMagnitude <= hitRadiusSq)
+                    {
+                        targetNetPlayer.health = Mathf.Max(0, targetNetPlayer.health - 1);
+                        if (targetNetPlayer.health <= 0)
+                        {
+                            SetPlayerDead(targetId, true);
+                        }
+                        else if (m_replicationServer != null)
+                        {
+                            m_replicationServer.MarkUpdate(targetId);
+                        }
+
+                        hitTarget = true;
+                        break;
+                    }
+                }
+
+                if (hitTarget)
+                {
+                    DestroyBullet(b.id);
+                    m_bullets.RemoveAt(i);
+                }
             }
         }
 
@@ -392,6 +476,7 @@ namespace Delivery3
                         if (netPlayerComp != null)
                         {
                             netPlayerComp.playerRole = p.data.playerRole;
+                            netPlayerComp.health = isHunter ? 3 : 1;
                             netPlayerComp.isDead = false;
                             netPlayerComp.isMoving = false;
                         }

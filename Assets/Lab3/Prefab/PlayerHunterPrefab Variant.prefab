@@ -103,7 +103,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Delivery3.NetPlayer
   id: 0
   type: 1
-  health: 100
+  health: 3
   playerRole: Hunter
   isMoving: 0
   isDead: 0

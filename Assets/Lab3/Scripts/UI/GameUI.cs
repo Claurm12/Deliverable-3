@@ -46,7 +46,38 @@ namespace Delivery3
             LobbySession session = LobbySession.Instance;
             LobbyClient client = session.Client;
 
+            string role = "Chased";
+            if (client != null && !string.IsNullOrEmpty(client.userName) &&
+                client.Teams.TryGetValue(client.userName, out PlayerDTO2 dto) &&
+                !string.IsNullOrEmpty(dto.playerRole))
+            {
+                role = dto.playerRole;
+            }
+
+            int lives = (role == "Hunter") ? 3 : 1;
+            bool isDead = false;
+
+            int myId = NetObject.ComputeId(client.userName);
+            LinkingContext linking = client.GetComponent<LinkingContext>();
+            if (linking == null) linking = FindObjectOfType<LinkingContext>();
+            if (linking != null)
+            {
+                GameObject myGo = linking.Find(myId);
+                if (myGo != null)
+                {
+                    NetPlayer np = myGo.GetComponent<NetPlayer>();
+                    if (np != null)
+                    {
+                        lives = np.health;
+                        isDead = np.isDead;
+                    }
+                }
+            }
+
+            string statusText = isDead ? "DEAD" : ("Lives: " + lives);
+
             LobbyGUI.Begin("<color=black>GAME  (" + session.protocol + ")   " + client.RoomInfo);
+            GUILayout.Label("<color=black>Role: " + role + "   |   " + statusText);
             GUILayout.Label("<color=black>Move: forward: W / ↑ Left: A / ← Backward: S / ↓ Right: D / →  Jump: Space  Shoot: F");
             GUILayout.Label("<color=black>Players: " + string.Join(", ", client.Players) +
                             "<color=black>    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));

@@ -23,6 +23,8 @@ namespace Delivery3
         void Update()
         {
             if (LobbyGUI.NeedsSession()) return;
+            if (m_netPlayer != null && m_netPlayer.isDead) return;
+
             LobbySession session = LobbySession.Instance;
             LobbyClient client = session.Client;
 
@@ -80,6 +82,16 @@ namespace Delivery3
         void FixedUpdate()
         {
             if (LobbyGUI.NeedsSession() || GameUI.IsTypingInChat) return;
+
+            if (m_netPlayer != null && m_netPlayer.isDead)
+            {
+                if (m_rb != null)
+                {
+                    m_rb.linearVelocity = Vector3.zero;
+                    m_rb.angularVelocity = Vector3.zero;
+                }
+                return;
+            }
 
             float moveSpeed = 6f;
             float h = 0f;
