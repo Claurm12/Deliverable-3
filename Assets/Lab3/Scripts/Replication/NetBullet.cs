@@ -3,24 +3,21 @@ using UnityEngine;
 
 namespace Delivery3
 {
-    //el servidor es quien crea la bala, la mueve y la destruye
-    // los clientes la reciben por replicacion y solo la extrapolan entre paquetes para que se vea fluida.
     public class NetBullet : NetObject
     {
-        
         public const byte TypeId = 200;
 
-        public const float Speed = 12f;        
-        public const float Lifetime = 2f;      
-        public const float Cooldown = 2.0f;    
-        public const int MaxAlivePerPlayer = 3; 
+        public const float Speed = 12f;
+        public const float Lifetime = 2f;
+        public const float Cooldown = 2.0f;
+        public const int MaxAlivePerPlayer = 3;
 
-        // referencia para poder desregistrarla si el Destroy del servidor nunca llega.
-        [System.NonSerialized] public LinkingContext replicaLinking;
+        [System.NonSerialized]
+        public LinkingContext replicaLinking;
+
         float m_spawnTime;
         bool m_hasServerPos;
 
-        
         public static NetBullet CreateVisual(Vector3 pos, float rotY)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -30,7 +27,9 @@ namespace Delivery3
             go.transform.localScale = Vector3.one * 0.4f;
 
             Collider col = go.GetComponent<Collider>();
-            if (col != null) col.isTrigger = true;
+
+            if (col != null)
+                col.isTrigger = true;
 
             NetBullet bullet = go.AddComponent<NetBullet>();
             bullet.type = TypeId;
@@ -44,22 +43,36 @@ namespace Delivery3
 
         void Update()
         {
-            
-            transform.position += transform.forward * Speed * Time.deltaTime;
-            if (replicaLinking != null && Time.time - m_spawnTime > Lifetime + 2f)
+            if (replicaLinking == null)
+                return;
+
+            transform.position +=
+                transform.forward * Speed * Time.deltaTime;
+
+            if (Time.time - m_spawnTime > Lifetime + 2f)
             {
                 replicaLinking.Unregister(id);
                 Destroy(gameObject);
             }
         }
+
         public override void Read(BinaryReader reader)
         {
-            Vector3 serverPos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            Vector3 serverPos = new Vector3(
+                reader.ReadSingle(),
+                reader.ReadSingle(),
+                reader.ReadSingle());
+
             float rotY = reader.ReadSingle();
 
             transform.rotation = Quaternion.Euler(0f, rotY, 0f);
-            if (!m_hasServerPos || (transform.position - serverPos).sqrMagnitude > 1.5f * 1.5f)
+
+            if (!m_hasServerPos ||
+                (transform.position - serverPos).sqrMagnitude > 1.5f * 1.5f)
+            {
                 transform.position = serverPos;
+            }
+
             m_hasServerPos = true;
         }
     }

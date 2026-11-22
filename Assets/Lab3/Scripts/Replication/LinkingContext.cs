@@ -5,11 +5,20 @@ namespace Delivery3
 {
     public class LinkingContext : MonoBehaviour
     {
-        private readonly Dictionary<int, GameObject> m_registry = new Dictionary<int, GameObject>();
+        private readonly Dictionary<int, GameObject> m_registry =
+            new Dictionary<int, GameObject>();
+
         private int m_nextId = 1;
 
-        public IEnumerable<int> Ids { get { return m_registry.Keys; } }
-        public int Count { get { return m_registry.Count; } }
+        public IEnumerable<int> Ids
+        {
+            get { return m_registry.Keys; }
+        }
+
+        public int Count
+        {
+            get { return m_registry.Count; }
+        }
 
         public void Register(GameObject obj, int id)
         {
@@ -18,9 +27,24 @@ namespace Delivery3
 
         public int Register(GameObject obj)
         {
+            while (m_registry.ContainsKey(m_nextId))
+                m_nextId++;
+
             int id = m_nextId++;
             m_registry[id] = obj;
             return id;
+        }
+
+        public void Clear()
+        {
+            foreach (GameObject obj in m_registry.Values)
+            {
+                if (obj != null)
+                    Destroy(obj);
+            }
+
+            m_registry.Clear();
+            m_nextId = 1;
         }
 
         public void Unregister(int id)

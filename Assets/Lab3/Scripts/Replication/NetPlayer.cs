@@ -31,6 +31,7 @@ namespace Delivery3
             shotCount++;
             m_lastAppliedShotCount = shotCount;
             m_initializedShotCount = true;
+
             if (m_animator != null && !isDead)
             {
                 m_animator.ResetTrigger("Shoot");
@@ -42,7 +43,9 @@ namespace Delivery3
         {
             if (m_animator == null)
                 m_animator = GetComponentInChildren<Animator>();
-            if (m_animator == null) return;
+
+            if (m_animator == null)
+                return;
 
             m_animator.SetBool("IsMoving", isMoving);
             m_animator.SetBool("IsDead", isDead);
@@ -57,6 +60,7 @@ namespace Delivery3
             if (!m_isLocalPlayer && shotCount > m_lastAppliedShotCount)
             {
                 m_lastAppliedShotCount = shotCount;
+
                 if (!isDead)
                 {
                     m_animator.ResetTrigger("Shoot");

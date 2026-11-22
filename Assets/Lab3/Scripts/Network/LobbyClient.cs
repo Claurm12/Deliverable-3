@@ -13,11 +13,18 @@ namespace Delivery3
         public PlayerDTO2 myData;
         public float pingSeconds = 1f;
 
-        public string userName { get { return myData.playerName; } }
+        public string userName
+        {
+            get { return myData.playerName; }
+        }
 
         public readonly List<string> Players = new List<string>();
-        public readonly Dictionary<string, PlayerDTO2> Teams = new Dictionary<string, PlayerDTO2>();
+
+        public readonly Dictionary<string, PlayerDTO2> Teams =
+            new Dictionary<string, PlayerDTO2>();
+
         public readonly List<string> Chat = new List<string>();
+
         public string RoomInfo = "";
         public int PingMs = -1;
         public bool InRoom { get; private set; }
@@ -26,8 +33,12 @@ namespace Delivery3
         public event Action GameStarted;
         public event Action<string> Closed;
 
-        protected readonly ConcurrentQueue<byte[]> m_inbox = new ConcurrentQueue<byte[]>();
-        protected volatile string m_endReason = "Connection to the server lost";
+        protected readonly ConcurrentQueue<byte[]> m_inbox =
+            new ConcurrentQueue<byte[]>();
+
+        protected volatile string m_endReason =
+            "Connection to the server lost";
+
         protected float m_lastHeard;
         float m_lastPing;
         bool m_closed;
@@ -45,13 +56,22 @@ namespace Delivery3
         protected abstract void SendBytes(byte[] message);
         protected abstract void CloseSocket();
 
-        protected void SendText(string text) { SendBytes(Messages.Text(text)); }
-        protected byte[] JoinMessage() { return Messages.Player(myData); }
+        protected void SendText(string text)
+        {
+            SendBytes(Messages.Text(text));
+        }
+
+        protected byte[] JoinMessage()
+        {
+            return Messages.Player(myData);
+        }
 
         public void SendChat(string line)
         {
             line = line.Trim();
-            if (line.Length > 0) SendText("CHAT:" + line);
+
+            if (line.Length > 0)
+                SendText("CHAT:" + line);
         }
 
         public void UpdateData(PlayerDTO2 data)
@@ -77,33 +97,40 @@ namespace Delivery3
             if (m_linkingContext == null)
             {
                 m_linkingContext = gameObject.GetComponent<LinkingContext>();
+
                 if (m_linkingContext == null)
-                {
                     m_linkingContext = gameObject.AddComponent<LinkingContext>();
-                }
             }
 
             if (m_replicationClient == null)
             {
-                m_replicationClient = gameObject.GetComponent<ReplicationManagerClient>();
+                m_replicationClient =
+                    gameObject.GetComponent<ReplicationManagerClient>();
+
                 if (m_replicationClient == null)
                 {
-                    m_replicationClient = gameObject.AddComponent<ReplicationManagerClient>();
+                    m_replicationClient =
+                        gameObject.AddComponent<ReplicationManagerClient>();
                 }
             }
 
             GameObject[] prefabsToUse = GetEffectivePrefabs();
-            m_replicationClient.Init(m_linkingContext, prefabsToUse != null ? new List<GameObject>(prefabsToUse) : null);
+
+            m_replicationClient.Init(
+                m_linkingContext,
+                prefabsToUse != null
+                    ? new List<GameObject>(prefabsToUse)
+                    : null);
         }
 
         GameObject[] GetEffectivePrefabs()
         {
             if (networkPrefabs != null && networkPrefabs.Length > 0)
-            {
                 return networkPrefabs;
-            }
 
-            if (LobbySession.Instance != null && LobbySession.Instance.networkPrefabs != null && LobbySession.Instance.networkPrefabs.Length > 0)
+            if (LobbySession.Instance != null &&
+                LobbySession.Instance.networkPrefabs != null &&
+                LobbySession.Instance.networkPrefabs.Length > 0)
             {
                 return LobbySession.Instance.networkPrefabs;
             }
@@ -114,20 +141,32 @@ namespace Delivery3
         protected virtual void Update()
         {
             byte[] data;
+
             while (!m_closed && m_inbox.TryDequeue(out data))
             {
-                if (data == null) { Close(m_endReason); break; }
+                if (data == null)
+                {
+                    Close(m_endReason);
+                    break;
+                }
+
                 m_lastHeard = Time.realtimeSinceStartup;
 
-                if (data.Length > 0 && (MsgType)data[0] == MsgType.Replication)
+                if (data.Length > 0 &&
+                    (MsgType)data[0] == MsgType.Replication)
                 {
+                    if (LobbySession.Instance.IsHost)
+                        continue;
+
                     if (m_replicationClient != null)
                     {
-                        using (BinaryReader reader = new BinaryReader(new MemoryStream(data, 1, data.Length - 1)))
+                        using (BinaryReader reader = new BinaryReader(
+                            new MemoryStream(data, 1, data.Length - 1)))
                         {
                             m_replicationClient.ReadPacket(reader);
                         }
                     }
+
                     continue;
                 }
 
@@ -141,11 +180,20 @@ namespace Delivery3
 
                 try
                 {
-                    type = Messages.Read(data, out text, out dto, out objectId, out pos, out rotY, out dir);
+                    type = Messages.Read(
+                        data,
+                        out text,
+                        out dto,
+                        out objectId,
+                        out pos,
+                        out rotY,
+                        out dir);
                 }
                 catch (Exception e)
                 {
-                    Log("[CLIENT " + userName + "] Paquete corrupto descartado: " + e.Message);
+                    Log(
+                        "[CLIENT " + userName +
+                        "] Paquete corrupto descartado: " + e.Message);
                     continue;
                 }
 
@@ -155,11 +203,13 @@ namespace Delivery3
                 }
                 else if (type == MsgType.Transform)
                 {
-                    if (TransformReceived != null) TransformReceived(objectId, pos, rotY);
+                    if (TransformReceived != null)
+                        TransformReceived(objectId, pos, rotY);
                 }
                 else if (type == MsgType.Shoot)
                 {
-                    if (ShootReceived != null) ShootReceived(objectId, pos, dir);
+                    if (ShootReceived != null)
+                        ShootReceived(objectId, pos, dir);
                 }
                 else
                 {
@@ -167,7 +217,9 @@ namespace Delivery3
                 }
             }
 
-            if (!m_closed && InRoom && Time.realtimeSinceStartup - m_lastPing >= pingSeconds)
+            if (!m_closed &&
+                InRoom &&
+                Time.realtimeSinceStartup - m_lastPing >= pingSeconds)
             {
                 m_lastPing = Time.realtimeSinceStartup;
                 SendText("PING:" + Environment.TickCount + "," + PingMs);
@@ -179,7 +231,9 @@ namespace Delivery3
             PlayerDTO2 old;
             bool changed = !Teams.TryGetValue(dto.playerName, out old);
             Teams[dto.playerName] = dto;
-            if (changed) Log("[CLIENT " + userName + "] Datos de " + dto.playerName);
+
+            if (changed)
+                Log("[CLIENT " + userName + "] Datos de " + dto.playerName);
         }
 
         void OnText(string text)
@@ -192,11 +246,26 @@ namespace Delivery3
             {
                 case "PLAYERS":
                     Players.Clear();
-                    if (content.Length > 0) Players.AddRange(content.Split(','));
+
+                    if (content.Length > 0)
+                        Players.AddRange(content.Split(','));
+
                     foreach (string name in new List<string>(Teams.Keys))
-                        if (!Players.Contains(name)) Teams.Remove(name);
-                    Log("[CLIENT " + userName + "] Jugadores (" + Players.Count + "): " + string.Join(", ", Players));
-                    if (!InRoom) { InRoom = true; if (Joined != null) Joined(); }
+                    {
+                        if (!Players.Contains(name))
+                            Teams.Remove(name);
+                    }
+
+                    Log(
+                        "[CLIENT " + userName + "] Jugadores (" +
+                        Players.Count + "): " + string.Join(", ", Players));
+
+                    if (!InRoom)
+                    {
+                        InRoom = true;
+                        if (Joined != null) Joined();
+                    }
+
                     break;
 
                 case "ROOM":
@@ -205,18 +274,27 @@ namespace Delivery3
 
                 case "CHAT":
                     Chat.Add(content);
-                    if (Chat.Count > 50) Chat.RemoveAt(0);
+
+                    if (Chat.Count > 50)
+                        Chat.RemoveAt(0);
+
                     Log("[CLIENT " + userName + "] Chat: " + content);
                     break;
 
                 case "PONG":
                     int sent;
-                    if (int.TryParse(content, out sent)) PingMs = Environment.TickCount - sent;
+
+                    if (int.TryParse(content, out sent))
+                        PingMs = Environment.TickCount - sent;
+
                     break;
 
                 case "START":
                     Log("[CLIENT " + userName + "] El host ha iniciado el juego");
-                    if (GameStarted != null) GameStarted();
+
+                    if (GameStarted != null)
+                        GameStarted();
+
                     break;
 
                 case "KICKED":
@@ -232,11 +310,15 @@ namespace Delivery3
         protected void Close(string reason)
         {
             if (m_closed) return;
+
             m_closed = true;
             InRoom = false;
             CloseSocket();
+
             Log("[CLIENT " + userName + "] Cerrado: " + reason);
-            if (Closed != null) Closed(reason);
+
+            if (Closed != null)
+                Closed(reason);
         }
 
         void OnDestroy()
@@ -248,7 +330,10 @@ namespace Delivery3
             }
         }
 
-        protected void Log(string message) { LobbySession.Log(message); }
+        protected void Log(string message)
+        {
+            LobbySession.Log(message);
+        }
 
         public virtual void SendCustomBytes(byte[] payload)
         {
