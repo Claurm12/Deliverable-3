@@ -51,12 +51,15 @@ namespace Delivery3
 
         public bool Started { get; private set; }
         public bool MatchEnded { get; private set; }
+        public string MatchResult { get; private set; } = "";
         public abstract bool IsRunning { get; }
 
         protected ReplicationManagerServer m_replicationServer;
         protected LinkingContext m_linkingContext;
 
         NpcCrowd m_npcCrowd;
+        TaskMatch m_taskMatch;
+
         private float m_tickTimer;
         private const float ServerTickRate = 0.05f;
 
@@ -199,6 +202,9 @@ namespace Delivery3
 
             if (Started)
             {
+                if (m_taskMatch != null)
+                    m_taskMatch.ServerUpdate();
+
                 if (!MatchEnded)
                     UpdateBullets();
 
@@ -233,6 +239,9 @@ namespace Delivery3
                 foreach (NetPlayer npc in m_npcCrowd.Players)
                     m_replicationServer.MarkUpdate(npc.id);
             }
+
+            if (m_taskMatch != null)
+                m_replicationServer.MarkUpdate(m_taskMatch.id);
 
             byte[] replicationPacket = m_replicationServer.WritePacket();
 
@@ -473,6 +482,31 @@ namespace Delivery3
                 m_replicationServer);
         }
 
+        public void SetupTasks(TaskMatch tasks)
+        {
+            if (!Started || m_taskMatch != null || tasks == null)
+                return;
+
+            m_taskMatch = tasks;
+            tasks.id = m_linkingContext.Register(tasks.gameObject);
+            tasks.type = TaskMatch.TypeId;
+
+            m_replicationServer.MarkCreate(tasks.id);
+            tasks.Setup(this, m_linkingContext);
+        }
+
+        public void EndMatch(string result)
+        {
+            if (!Started || MatchEnded)
+                return;
+
+            MatchResult = result;
+            MatchEnded = true;
+
+            Broadcast("CHAT:* " + result);
+            Log("[GAME] " + result);
+        }
+
         void OnShoot(
             object from,
             Player player,
@@ -641,10 +675,8 @@ namespace Delivery3
             if (!Started || MatchEnded)
                 return;
 
-            int totalChased = 0;
             int aliveChased = 0;
             bool anyHunterAlive = false;
-            bool anyHunterExists = false;
 
             foreach (Player p in m_players)
             {
@@ -658,34 +690,20 @@ namespace Delivery3
 
                 if (p.data.playerRole == "Hunter")
                 {
-                    anyHunterExists = true;
-
                     if (!isDead)
                         anyHunterAlive = true;
                 }
                 else if (p.data.playerRole == "Chased")
                 {
-                    totalChased++;
-
                     if (!isDead)
                         aliveChased++;
                 }
             }
 
-            if (anyHunterExists && !anyHunterAlive)
-            {
-                MatchEnded = true;
-                Log("[GAME] El cazador se ha quedado sin vidas. Ganan los Chased.");
-                Broadcast(
-                    "CHAT:* Fin de partida: el cazador ha perdido. " +
-                    "¡Ganan los que escapan!");
-            }
-            else if (totalChased > 0 && aliveChased == 0)
-            {
-                MatchEnded = true;
-                Log("[GAME] Todos los Chased eliminados. Gana el Hunter.");
-                Broadcast("CHAT:* Fin de partida: ¡gana el cazador!");
-            }
+            if (!anyHunterAlive)
+                EndMatch("Hunter is out. Chased win!");
+            else if (aliveChased == 0)
+                EndMatch("All chased are out. Hunter wins!");
         }
 
         void UpdateBullets()
@@ -908,57 +926,60 @@ namespace Delivery3
             if (Started)
                 return;
 
-            MatchEnded = false;
-
-            if (m_players.Count > 0)
+            if (m_players.Count < 2)
             {
-                int hunterIndex =
-                    UnityEngine.Random.Range(0, m_players.Count);
+                Broadcast("CHAT:* We need at least two players to start!");
+                return;
+            }
 
-                for (int i = 0; i < m_players.Count; i++)
+            MatchEnded = false;
+            MatchResult = "";
+
+            int hunterIndex =
+                UnityEngine.Random.Range(0, m_players.Count);
+
+            for (int i = 0; i < m_players.Count; i++)
+            {
+                Player p = m_players[i];
+                bool isHunter = i == hunterIndex;
+                p.data.playerRole = isHunter ? "Hunter" : "Chased";
+
+                int prefabType =
+                    isHunter ? 0 : GetRandomChasedPrefabType();
+
+                p.assignedPrefabType = prefabType;
+
+                int netId = NetObject.ComputeId(p.name);
+                GameObject go = EnsureServerObject(netId, prefabType);
+
+                if (go != null)
                 {
-                    Player p = m_players[i];
-                    bool isHunter = i == hunterIndex;
-                    p.data.playerRole = isHunter ? "Hunter" : "Chased";
+                    NetPlayer netPlayerComp = go.GetComponent<NetPlayer>();
 
-                    int prefabType =
-                        isHunter ? 0 : GetRandomChasedPrefabType();
-
-                    p.assignedPrefabType = prefabType;
-
-                    int netId = NetObject.ComputeId(p.name);
-                    GameObject go = EnsureServerObject(netId, prefabType);
-
-                    if (go != null)
+                    if (netPlayerComp != null)
                     {
-                        NetPlayer netPlayerComp =
-                            go.GetComponent<NetPlayer>();
-
-                        if (netPlayerComp != null)
-                        {
-                            netPlayerComp.playerRole = p.data.playerRole;
-                            netPlayerComp.health = isHunter ? 3 : 1;
-                            netPlayerComp.isDead = false;
-                            netPlayerComp.isMoving = false;
-                            netPlayerComp.ApplyAnimationState();
-                        }
-
-                        if (m_replicationServer != null)
-                        {
-                            m_replicationServer.MarkCreate(netId);
-                            m_replicationServer.MarkUpdate(netId);
-                        }
+                        netPlayerComp.playerRole = p.data.playerRole;
+                        netPlayerComp.health = isHunter ? 3 : 1;
+                        netPlayerComp.isDead = false;
+                        netPlayerComp.isMoving = false;
+                        netPlayerComp.ApplyAnimationState();
                     }
 
-                    SendText(
-                        p.connection,
-                        isHunter
-                            ? "CHAT:Eres el CAZADOR"
-                            : "CHAT:Escapa del cazador");
+                    if (m_replicationServer != null)
+                    {
+                        m_replicationServer.MarkCreate(netId);
+                        m_replicationServer.MarkUpdate(netId);
+                    }
                 }
 
-                SendRoomState();
+                SendText(
+                    p.connection,
+                    isHunter
+                        ? "CHAT:Eres el CAZADOR"
+                        : "CHAT:Escapa del cazador");
             }
+
+            SendRoomState();
 
             Started = true;
             Broadcast("START:");
@@ -1041,6 +1062,8 @@ namespace Delivery3
             m_bullets.Clear();
             m_players.Clear();
             m_npcCrowd = null;
+            m_taskMatch = null;
+            MatchResult = "";
             Started = false;
             MatchEnded = false;
         }

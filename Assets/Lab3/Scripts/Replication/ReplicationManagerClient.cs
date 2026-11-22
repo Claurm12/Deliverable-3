@@ -57,11 +57,11 @@ namespace Delivery3
             m_lastSequence = sequence;
 
             int count = reader.ReadInt32();
-            Debug.Log("[REPL CLIENT] seq " + sequence + " entradas " + count);
 
             for (int i = 0; i < count; i++)
             {
                 int id = reader.ReadInt32();
+
                 ReplicationAction action =
                     (ReplicationAction)reader.ReadByte();
 
@@ -105,10 +105,6 @@ namespace Delivery3
 
                 if (go == null)
                 {
-                    Debug.Log(
-                        "[REPL CLIENT] creando id " +
-                        id + " tipo " + type);
-
                     go = InstantiatePrefab(id, type);
 
                     if (go == null)
@@ -153,6 +149,22 @@ namespace Delivery3
 
         private GameObject InstantiatePrefab(int id, byte type)
         {
+            if (type == TaskMatch.TypeId)
+            {
+                TaskMatch tasks = FindObjectOfType<TaskMatch>();
+
+                if (tasks == null)
+                {
+                    GameObject state = new GameObject("TaskMatch");
+                    tasks = state.AddComponent<TaskMatch>();
+                }
+
+                tasks.id = id;
+                tasks.type = type;
+                m_linking.Register(tasks.gameObject, id);
+                return tasks.gameObject;
+            }
+
             if (type == NetBullet.TypeId)
             {
                 NetBullet bullet =
