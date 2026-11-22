@@ -402,10 +402,14 @@ namespace Delivery3
             n.type = (byte)validType;
 
             Rigidbody body = go.GetComponent<Rigidbody>();
-            if (body != null) body.isKinematic = true;
+
+            if (body != null)
+                body.isKinematic = true;
 
             Animator animator = go.GetComponentInChildren<Animator>();
-            if (animator != null) animator.applyRootMotion = false;
+
+            if (animator != null)
+                animator.applyRootMotion = false;
 
             m_linkingContext.Register(go, id);
             return go;
@@ -438,7 +442,8 @@ namespace Delivery3
 
                 if (np != null)
                 {
-                    if (np.isDead) return;
+                    if (np.isDead)
+                        return;
 
                     np.isMoving =
                         (go.transform.position - pos).sqrMagnitude > 0.0001f;
@@ -483,7 +488,8 @@ namespace Delivery3
 
         public void ShootFromHost(int objectId, Vector3 pos, Vector3 dir)
         {
-            if (MatchEnded) return;
+            if (MatchEnded)
+                return;
 
             foreach (Player p in m_players)
             {
@@ -773,7 +779,8 @@ namespace Delivery3
                 {
                     if (hitNpc)
                     {
-                        OnHunterHitNpc(b.owner);
+                        if (m_npcCrowd.RemoveNpc(closestPlayer))
+                            OnHunterHitNpc(b.owner);
                     }
                     else
                     {

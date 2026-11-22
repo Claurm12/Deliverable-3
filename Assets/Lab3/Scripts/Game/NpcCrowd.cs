@@ -23,7 +23,10 @@ namespace Delivery3
             public Vector3 groundPosition;
             public Vector3[] corners;
             public int corner;
-            public float changeAt;
+            public float stateUntil;
+            public float turnAt;
+            public float pace;
+            public float currentSpeed;
             public float nextJumpAt;
             public float jumpHeight;
             public float verticalVelocity;
@@ -31,7 +34,10 @@ namespace Delivery3
         }
 
         readonly List<Npc> m_npcs = new List<Npc>();
+
         LobbyServer m_server;
+        LinkingContext m_linking;
+        ReplicationManagerServer m_replication;
         bool m_frozen;
 
         public void Spawn(
@@ -41,6 +47,8 @@ namespace Delivery3
             ReplicationManagerServer replication)
         {
             m_server = server;
+            m_linking = linking;
+            m_replication = replication;
 
             if (prefabs == null || prefabs.Length < 2)
             {
@@ -88,15 +96,19 @@ namespace Delivery3
 
                 go.name = "NPC";
 
-                PlayerController controller = go.GetComponent<PlayerController>();
+                PlayerController controller =
+                    go.GetComponent<PlayerController>();
+
                 if (controller != null)
                     controller.enabled = false;
 
                 Rigidbody body = go.GetComponent<Rigidbody>();
+
                 if (body != null)
                     body.isKinematic = true;
 
                 Animator animator = go.GetComponentInChildren<Animator>();
+
                 if (animator != null)
                     animator.applyRootMotion = false;
 
@@ -111,7 +123,7 @@ namespace Delivery3
                 {
                     player = player,
                     groundPosition = position,
-                    changeAt = Time.time + Random.Range(0.2f, 2f),
+                    stateUntil = Time.time + Random.Range(0.2f, 2f),
                     nextJumpAt = Time.time + JumpDelay()
                 });
 
@@ -132,6 +144,23 @@ namespace Delivery3
                         yield return npc.player;
                 }
             }
+        }
+
+        public bool RemoveNpc(NetPlayer player)
+        {
+            for (int i = 0; i < m_npcs.Count; i++)
+            {
+                if (m_npcs[i].player != player)
+                    continue;
+
+                m_npcs.RemoveAt(i);
+                m_linking.Unregister(player.id);
+                m_replication.MarkDestroy(player.id);
+                Destroy(player.gameObject);
+                return true;
+            }
+
+            return false;
         }
 
         void Update()
@@ -182,21 +211,41 @@ namespace Delivery3
 
         void UpdateWalking(Npc npc)
         {
-            if (Time.time >= npc.changeAt)
+            if (Time.time >= npc.stateUntil)
             {
                 if (npc.player.isMoving)
                 {
                     SetMoving(npc, false);
-                    npc.changeAt = Time.time + Random.Range(0.8f, 3f);
+                    npc.stateUntil = Time.time + Random.Range(0.8f, 4f);
                 }
-                else if (!StartWalking(npc))
+                else if (ChoosePath(npc))
                 {
-                    npc.changeAt = Time.time + Random.Range(0.8f, 3f);
+                    npc.stateUntil = Time.time +
+                        (Random.value < 0.5f
+                            ? Random.Range(4f, 9f)
+                            : Random.Range(12f, 30f));
+
+                    npc.turnAt = Time.time + Random.Range(2f, 7f);
+                    npc.pace = speed * Random.Range(0.8f, 1f);
+                    SetMoving(npc, true);
+                }
+                else
+                {
+                    npc.stateUntil = Time.time + Random.Range(0.8f, 3f);
                 }
             }
 
             if (!npc.player.isMoving)
+            {
+                npc.currentSpeed = 0f;
                 return;
+            }
+
+            if (Time.time >= npc.turnAt)
+            {
+                ChoosePath(npc);
+                npc.turnAt = Time.time + Random.Range(2f, 7f);
+            }
 
             Vector3 destination = npc.corners[npc.corner];
             Vector3 delta = destination - npc.groundPosition;
@@ -210,10 +259,15 @@ namespace Delivery3
                     360f * Time.deltaTime);
             }
 
+            npc.currentSpeed = Mathf.MoveTowards(
+                npc.currentSpeed,
+                npc.pace,
+                12f * Time.deltaTime);
+
             npc.groundPosition = Vector3.MoveTowards(
                 npc.groundPosition,
                 destination,
-                speed * Time.deltaTime);
+                npc.currentSpeed * Time.deltaTime);
 
             if ((npc.groundPosition - destination).sqrMagnitude < 0.01f)
             {
@@ -221,8 +275,15 @@ namespace Delivery3
 
                 if (npc.corner >= npc.corners.Length)
                 {
-                    SetMoving(npc, false);
-                    npc.changeAt = Time.time + Random.Range(0.8f, 3f);
+                    if (ChoosePath(npc))
+                    {
+                        npc.turnAt = Time.time + Random.Range(2f, 7f);
+                    }
+                    else
+                    {
+                        SetMoving(npc, false);
+                        npc.stateUntil = Time.time + Random.Range(0.8f, 3f);
+                    }
                 }
             }
         }
@@ -256,26 +317,28 @@ namespace Delivery3
             return Random.Range(min, Mathf.Max(min, maxJumpDelay));
         }
 
-        bool StartWalking(Npc npc)
+        bool ChoosePath(Npc npc)
         {
             NavMeshPath path = new NavMeshPath();
 
             for (int i = 0; i < 10; i++)
             {
                 Vector3 destination;
+                float radius = Mathf.Max(wanderRadius, spawnRadius * 0.65f);
 
-                if (!TrySample(
-                        npc.groundPosition,
-                        wanderRadius,
-                        out destination))
-                {
+                if (!TrySample(npc.groundPosition, radius, out destination))
                     continue;
-                }
 
                 Vector3 offset = destination - transform.position;
                 offset.y = 0f;
 
                 if (offset.sqrMagnitude > spawnRadius * spawnRadius)
+                    continue;
+
+                Vector3 travel = destination - npc.groundPosition;
+                travel.y = 0f;
+
+                if (travel.sqrMagnitude < 9f)
                     continue;
 
                 if (!NavMesh.CalculatePath(
@@ -291,8 +354,6 @@ namespace Delivery3
 
                 npc.corners = path.corners;
                 npc.corner = 1;
-                npc.changeAt = Time.time + Random.Range(2f, 5f);
-                SetMoving(npc, true);
                 return true;
             }
 
