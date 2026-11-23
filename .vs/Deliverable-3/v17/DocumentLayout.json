@@ -1,25 +1,41 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\",
+  "WorkspaceRootPath": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|c:\\users\\marti\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\network\\lobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\menuui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\menuui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|b:\\clase\\4rt\\xarxas\\entrega_sockets\\deliverable-3\\assets\\lab3\\scripts\\ui\\waitingroomui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\waitingroomui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\creategameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\creategameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\joingameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\joingameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\network\\lobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\lobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|c:\\users\\marti\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\replication\\netbullet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\replication\\netbullet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\replication\\netbullet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|c:\\users\\marti\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\game\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\game\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\game\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|c:\\users\\marti\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\replication\\replicationmanagerclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\replication\\replicationmanagerclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\replication\\replicationmanagerclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|c:\\users\\marti\\documents\\github\\deliverable-3\\assets\\lab3\\scripts\\game\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\game\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\game\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -30,72 +46,125 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 5,
           "Children": [
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "LobbyServer.cs",
-              "DocumentMoniker": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
-              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
-              "ToolTip": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
-              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
-              "ViewState": "AgIAALcBAAAAAAAAAAAAALcBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-21T11:02:56.856Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "NetBullet.cs",
-              "DocumentMoniker": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Replication\\NetBullet.cs",
-              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Replication\\NetBullet.cs",
-              "ToolTip": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Replication\\NetBullet.cs",
-              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Replication\\NetBullet.cs",
-              "ViewState": "AgIAACcAAAAAAAAAAAA1wDsAAABAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-21T10:58:28.452Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{e8b06f52-6d01-11d2-aa7d-00c04f990343}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "ReplicationManagerClient.cs",
-              "DocumentMoniker": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Replication\\ReplicationManagerClient.cs",
-              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Replication\\ReplicationManagerClient.cs",
-              "ToolTip": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Replication\\ReplicationManagerClient.cs",
-              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Replication\\ReplicationManagerClient.cs",
-              "ViewState": "AgIAAFsAAAAAAAAAAAAkwFUAAAAcAAAAAAAAAA==",
+              "Title": "JoinGameUI.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\JoinGameUI.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\JoinGameUI.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\JoinGameUI.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\JoinGameUI.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-21T10:56:36.467Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-11-23T19:06:50.257Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "PlayerController.cs",
-              "DocumentMoniker": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Game\\PlayerController.cs",
-              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Game\\PlayerController.cs",
-              "ToolTip": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Game\\PlayerController.cs",
-              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Game\\PlayerController.cs",
-              "ViewState": "AgIAAHcAAAAAAAAAAAAgwFsAAAA+AAAAAAAAAA==",
+              "Title": "CreateGameUI.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\CreateGameUI.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\CreateGameUI.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\CreateGameUI.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\CreateGameUI.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACUAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-21T10:54:43.704Z",
+              "WhenOpened": "2026-11-23T19:05:26.521Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WaitingRoomUI.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-23T19:03:16.739Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MenuUI.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\MenuUI.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\MenuUI.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\MenuUI.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\MenuUI.cs",
+              "ViewState": "AgIAAFwAAAAAAAAAAAAIwBYAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-23T18:09:42.239Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
+              "Title": "LobbyServer.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
+              "ViewState": "AgIAALQBAAAAAAAAAIBJwLcBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-21T11:02:56.856Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "NetBullet.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Replication\\NetBullet.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Replication\\NetBullet.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Replication\\NetBullet.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Replication\\NetBullet.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAA1wDsAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-21T10:58:28.452Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ReplicationManagerClient.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Replication\\ReplicationManagerClient.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Replication\\ReplicationManagerClient.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Replication\\ReplicationManagerClient.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Replication\\ReplicationManagerClient.cs",
+              "ViewState": "AgIAAFsAAAAAAAAAAAAkwFUAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-21T10:56:36.467Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "PlayerController.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Game\\PlayerController.cs",
+              "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Game\\PlayerController.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Game\\PlayerController.cs",
+              "RelativeToolTip": "Assets\\Lab3\\Scripts\\Game\\PlayerController.cs",
+              "ViewState": "AgIAAHcAAAAAAAAAAAAgwFsAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-21T10:54:43.704Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "GameManager.cs",
-              "DocumentMoniker": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Game\\GameManager.cs",
+              "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Game\\GameManager.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\Game\\GameManager.cs",
-              "ToolTip": "C:\\Users\\marti\\Documents\\GitHub\\Deliverable-3\\Assets\\Lab3\\Scripts\\Game\\GameManager.cs",
+              "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\Game\\GameManager.cs",
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\Game\\GameManager.cs",
               "ViewState": "AgIAAMUAAAAAAAAAAAAqwNgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-21T10:53:30.356Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-11-21T10:53:30.356Z"
             }
           ]
         }
