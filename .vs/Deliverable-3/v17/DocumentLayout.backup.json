@@ -3,23 +3,23 @@
   "WorkspaceRootPath": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\menuui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\menuui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|b:\\clase\\4rt\\xarxas\\entrega_sockets\\deliverable-3\\assets\\lab3\\scripts\\ui\\waitingroomui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\waitingroomui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|b:\\clase\\4rt\\xarxas\\entrega_sockets\\deliverable-3\\assets\\lab3\\scripts\\ui\\menuui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\menuui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|b:\\clase\\4rt\\xarxas\\entrega_sockets\\deliverable-3\\assets\\lab3\\scripts\\ui\\creategameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\creategameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\creategameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|b:\\clase\\4rt\\xarxas\\entrega_sockets\\deliverable-3\\assets\\lab3\\scripts\\ui\\joingameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\ui\\joingameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\ui\\joingameui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|b:\\clase\\4rt\\xarxas\\entrega_sockets\\deliverable-3\\assets\\lab3\\scripts\\network\\lobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\assets\\lab3\\scripts\\network\\lobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{40D9B792-75B5-7A27-3AED-53B0B760346D}|Assembly-CSharp.csproj|solutionrelative:assets\\lab3\\scripts\\network\\lobbyserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -46,7 +46,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -66,8 +66,7 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\JoinGameUI.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAGwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-23T19:06:50.257Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-11-23T19:06:50.257Z"
             },
             {
               "$type": "Document",
@@ -79,12 +78,11 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\CreateGameUI.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACUAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-23T19:05:26.521Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-11-23T19:05:26.521Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "WaitingRoomUI.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\WaitingRoomUI.cs",
@@ -97,13 +95,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "MenuUI.cs",
               "DocumentMoniker": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\MenuUI.cs",
               "RelativeDocumentMoniker": "Assets\\Lab3\\Scripts\\UI\\MenuUI.cs",
               "ToolTip": "B:\\Clase\\4rt\\xarxas\\Entrega_Sockets\\Deliverable-3\\Assets\\Lab3\\Scripts\\UI\\MenuUI.cs",
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\UI\\MenuUI.cs",
-              "ViewState": "AgIAACMAAAAAAAAAAAAwwBYAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAFwAAAAAAAAAAAAIwBYAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-11-23T18:09:42.239Z",
               "EditorCaption": ""
@@ -118,8 +116,7 @@
               "RelativeToolTip": "Assets\\Lab3\\Scripts\\Network\\LobbyServer.cs",
               "ViewState": "AgIAALQBAAAAAAAAAIBJwLcBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-11-21T11:02:56.856Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-11-21T11:02:56.856Z"
             },
             {
               "$type": "Document",

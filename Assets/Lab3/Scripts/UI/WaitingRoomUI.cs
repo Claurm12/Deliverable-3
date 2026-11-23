@@ -19,83 +19,129 @@ namespace Delivery3
         private GUIStyle m_primaryBtnStyle;
         private GUIStyle m_secondaryBtnStyle;
         private GUIStyle m_smallBtnStyle;
+        private Texture2D m_shadowTex;
 
         void Start()
         {
             m_localIP = GetLocalIPAddress();
         }
 
-        private Texture2D MakeTex(int width, int height, Color col)
+        private Texture2D MakeGradTex(int w, int h, Color top, Color bottom, Color border, int borderSize)
         {
-            Color[] pix = new Color[width * height];
-            for (int i = 0; i < pix.Length; ++i) pix[i] = col;
-            Texture2D result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-            return result;
+            Texture2D tex = new Texture2D(w, h);
+            Color[] pixels = new Color[w * h];
+            for (int y = 0; y < h; y++)
+            {
+                float t = (float)y / (h - 1);
+                Color rowColor = Color.Lerp(bottom, top, t);
+                for (int x = 0; x < w; x++)
+                {
+                    bool isBorder = x < borderSize || x >= w - borderSize || y < borderSize || y >= h - borderSize;
+                    pixels[y * w + x] = isBorder ? border : rowColor;
+                }
+            }
+            tex.SetPixels(pixels);
+            tex.Apply();
+            return tex;
         }
 
         private void InitStyles()
         {
             if (m_cardStyle != null) return;
 
-            m_cardStyle = new GUIStyle(GUI.skin.box);
-            m_cardStyle.normal.background = MakeTex(2, 2, new Color(0.09f, 0.11f, 0.15f, 0.94f));
-            m_cardStyle.padding = new RectOffset(30, 30, 25, 25);
+            Color gold = new Color(1.00f, 0.82f, 0.20f, 1f);
+            Color cyan = new Color(0.42f, 0.78f, 0.88f, 0.85f);
 
-            m_panelStyle = new GUIStyle(GUI.skin.box);
-            m_panelStyle.normal.background = MakeTex(2, 2, new Color(0.13f, 0.16f, 0.22f, 0.95f));
-            m_panelStyle.padding = new RectOffset(15, 15, 15, 15);
+            m_shadowTex = new Texture2D(2, 2);
+            Color sc = new Color(0.05f, 0.04f, 0.08f, 0.55f);
+            m_shadowTex.SetPixels(new[] { sc, sc, sc, sc });
+            m_shadowTex.Apply();
 
-            m_titleStyle = new GUIStyle(GUI.skin.label);
-            m_titleStyle.fontSize = 28;
-            m_titleStyle.fontStyle = FontStyle.Bold;
-            m_titleStyle.normal.textColor = new Color(0.95f, 0.96f, 0.98f);
+            m_cardStyle = new GUIStyle(GUI.skin.box)
+            {
+                normal = { background = MakeGradTex(64, 64,
+                    new Color(0.22f, 0.23f, 0.28f, 0.95f),
+                    new Color(0.14f, 0.15f, 0.19f, 0.97f), gold, 3) },
+                padding = new RectOffset(30, 30, 26, 26)
+            };
 
-            m_subtitleStyle = new GUIStyle(GUI.skin.label);
-            m_subtitleStyle.fontSize = 14;
-            m_subtitleStyle.normal.textColor = new Color(0.60f, 0.68f, 0.78f);
+            m_panelStyle = new GUIStyle(GUI.skin.box)
+            {
+                normal = { background = MakeGradTex(32, 32,
+                    new Color(0.26f, 0.28f, 0.34f, 0.95f),
+                    new Color(0.18f, 0.19f, 0.24f, 0.96f), cyan, 2) },
+                padding = new RectOffset(15, 15, 14, 14)
+            };
 
-            m_labelStyle = new GUIStyle(GUI.skin.label);
-            m_labelStyle.fontSize = 15;
-            m_labelStyle.fontStyle = FontStyle.Bold;
-            m_labelStyle.normal.textColor = new Color(0.82f, 0.86f, 0.92f);
+            m_titleStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 27,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = gold }
+            };
 
-            m_playerItemStyle = new GUIStyle(GUI.skin.label);
-            m_playerItemStyle.fontSize = 16;
-            m_playerItemStyle.normal.textColor = Color.white;
-            m_playerItemStyle.padding = new RectOffset(5, 5, 4, 4);
+            m_subtitleStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 14,
+                normal = { textColor = new Color(0.85f, 0.88f, 0.92f) }
+            };
 
-            m_inputStyle = new GUIStyle(GUI.skin.textField);
-            m_inputStyle.fontSize = 16;
-            m_inputStyle.alignment = TextAnchor.MiddleLeft;
-            m_inputStyle.padding = new RectOffset(10, 10, 6, 6);
-            m_inputStyle.normal.textColor = Color.white;
-            m_inputStyle.normal.background = MakeTex(2, 2, new Color(0.18f, 0.22f, 0.29f, 1f));
-            m_inputStyle.focused.background = MakeTex(2, 2, new Color(0.22f, 0.27f, 0.36f, 1f));
+            m_labelStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 15,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = gold }
+            };
 
-            m_primaryBtnStyle = new GUIStyle(GUI.skin.button);
-            m_primaryBtnStyle.fontSize = 17;
-            m_primaryBtnStyle.fontStyle = FontStyle.Bold;
-            m_primaryBtnStyle.normal.textColor = Color.white;
-            m_primaryBtnStyle.normal.background = MakeTex(2, 2, new Color(0.85f, 0.26f, 0.22f, 1f));
-            m_primaryBtnStyle.hover.background = MakeTex(2, 2, new Color(0.95f, 0.32f, 0.28f, 1f));
-            m_primaryBtnStyle.active.background = MakeTex(2, 2, new Color(0.70f, 0.18f, 0.15f, 1f));
+            m_playerItemStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 16,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = Color.white },
+                padding = new RectOffset(4, 4, 4, 4)
+            };
 
-            m_secondaryBtnStyle = new GUIStyle(GUI.skin.button);
-            m_secondaryBtnStyle.fontSize = 17;
-            m_secondaryBtnStyle.fontStyle = FontStyle.Bold;
-            m_secondaryBtnStyle.normal.textColor = Color.white;
-            m_secondaryBtnStyle.normal.background = MakeTex(2, 2, new Color(0.25f, 0.30f, 0.38f, 1f));
-            m_secondaryBtnStyle.hover.background = MakeTex(2, 2, new Color(0.32f, 0.38f, 0.48f, 1f));
-            m_secondaryBtnStyle.active.background = MakeTex(2, 2, new Color(0.18f, 0.22f, 0.28f, 1f));
+            m_inputStyle = new GUIStyle(GUI.skin.textField)
+            {
+                fontSize = 16,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleLeft,
+                padding = new RectOffset(10, 10, 6, 6),
+                normal = { textColor = Color.white, background = MakeGradTex(16, 16,
+                    new Color(0.11f, 0.12f, 0.15f, 1f), new Color(0.15f, 0.16f, 0.20f, 1f), new Color(0.45f, 0.48f, 0.55f, 1f), 2) },
+                focused = { textColor = gold, background = MakeGradTex(16, 16,
+                    new Color(0.14f, 0.15f, 0.19f, 1f), new Color(0.19f, 0.20f, 0.25f, 1f), gold, 2) }
+            };
 
-            m_smallBtnStyle = new GUIStyle(GUI.skin.button);
-            m_smallBtnStyle.fontSize = 13;
-            m_smallBtnStyle.fontStyle = FontStyle.Bold;
-            m_smallBtnStyle.normal.textColor = Color.white;
-            m_smallBtnStyle.normal.background = MakeTex(2, 2, new Color(0.18f, 0.48f, 0.82f, 1f));
-            m_smallBtnStyle.hover.background = MakeTex(2, 2, new Color(0.24f, 0.56f, 0.92f, 1f));
+            m_primaryBtnStyle = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 17,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = Color.white, background = MakeGradTex(16, 32,
+                    new Color(0.44f, 0.86f, 0.24f, 1f), new Color(0.16f, 0.64f, 0.32f, 1f), new Color(0.82f, 1.00f, 0.65f, 0.95f), 2) },
+                hover = { textColor = Color.white, background = MakeGradTex(16, 32,
+                    new Color(0.54f, 0.94f, 0.32f, 1f), new Color(0.22f, 0.74f, 0.38f, 1f), Color.white, 2) }
+            };
+
+            m_secondaryBtnStyle = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 17,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = Color.white, background = MakeGradTex(16, 32,
+                    new Color(1.00f, 0.45f, 0.18f, 1f), new Color(0.86f, 0.22f, 0.18f, 1f), new Color(1.00f, 0.88f, 0.48f, 0.95f), 2) },
+                hover = { textColor = Color.white, background = MakeGradTex(16, 32,
+                    new Color(1.00f, 0.56f, 0.26f, 1f), new Color(0.96f, 0.30f, 0.24f, 1f), Color.white, 2) }
+            };
+
+            m_smallBtnStyle = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 13,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = Color.white, background = MakeGradTex(16, 32,
+                    new Color(0.20f, 0.62f, 0.82f, 1f), new Color(0.13f, 0.42f, 0.62f, 1f), new Color(0.60f, 0.88f, 0.98f, 0.9f), 2) },
+                hover = { textColor = Color.white, background = MakeGradTex(16, 32,
+                    new Color(0.28f, 0.72f, 0.92f, 1f), new Color(0.18f, 0.52f, 0.74f, 1f), Color.white, 2) }
+            };
         }
 
         void OnGUI()
@@ -107,7 +153,7 @@ namespace Delivery3
             LobbyClient client = session.Client;
 
             float cardWidth = Mathf.Min(860f, Screen.width - 40f);
-            float cardHeight = Mathf.Min(560f, Screen.height - 40f);
+            float cardHeight = Mathf.Min(585f, Screen.height - 40f);
             Rect cardRect = new Rect(
                 (Screen.width - cardWidth) * 0.5f,
                 (Screen.height - cardHeight) * 0.5f,
@@ -115,6 +161,7 @@ namespace Delivery3
                 cardHeight
             );
 
+            GUI.DrawTexture(new Rect(cardRect.x + 8f, cardRect.y + 10f, cardRect.width, cardRect.height), m_shadowTex);
             GUILayout.BeginArea(cardRect, m_cardStyle);
 
             GUILayout.BeginHorizontal();
@@ -132,7 +179,7 @@ namespace Delivery3
             {
                 GUILayout.Label("IP: " + m_localIP + " : " + session.Server.port, m_labelStyle);
                 GUILayout.Space(8);
-                if (GUILayout.Button("COPY IP", m_smallBtnStyle, GUILayout.Width(75), GUILayout.Height(24)))
+                if (GUILayout.Button("COPY IP", m_smallBtnStyle, GUILayout.Width(78), GUILayout.Height(26)))
                 {
                     GUIUtility.systemCopyBuffer = m_localIP;
                 }
@@ -141,17 +188,18 @@ namespace Delivery3
 
             GUILayout.Space(16);
 
-            float innerHeight = cardHeight - 175f;
+            // Más margen vertical para que los botones inferiores no queden pegados al borde
+            float innerHeight = cardHeight - 200f;
             GUILayout.BeginHorizontal(GUILayout.Height(innerHeight));
             DrawPlayers(session, client, innerHeight);
             GUILayout.Space(16);
             DrawStyledChat(client, innerHeight);
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(16);
+            GUILayout.Space(18);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(session.IsHost ? "CLOSE ROOM" : "LEAVE", m_secondaryBtnStyle, GUILayout.Width(160), GUILayout.Height(42)))
+            if (GUILayout.Button(session.IsHost ? "CLOSE ROOM" : "LEAVE", m_secondaryBtnStyle, GUILayout.Width(165), GUILayout.Height(42)))
             {
                 client.Leave();
             }
