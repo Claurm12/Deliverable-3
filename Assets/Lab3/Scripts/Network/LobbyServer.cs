@@ -419,8 +419,15 @@ namespace Delivery3
                     if (np.isDead)
                         return;
 
-                    np.isMoving = (go.transform.position - pos).sqrMagnitude > 0.0001f;
+                    Vector3 previousPos = go.transform.position;
+                    go.transform.position = pos;
+                    go.transform.rotation = Quaternion.Euler(0f, rotY, 0f);
+
+                    np.isMoving = (pos - previousPos).sqrMagnitude > 0.0001f;
                     np.ApplyAnimationState();
+                    if (m_replicationServer != null)
+                        m_replicationServer.MarkUpdate(objectId);
+                    return;
                 }
 
                 go.transform.position = pos;
