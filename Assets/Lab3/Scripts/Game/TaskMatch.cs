@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Delivery3
 {
@@ -10,6 +11,7 @@ namespace Delivery3
 
         const float MatchSeconds = 420f;
         const float CompleteDisplaySeconds = 1f;
+        const float ResultDisplaySeconds = 4f;
         const int Segments = 48;
 
         class TaskData
@@ -34,8 +36,15 @@ namespace Delivery3
         string m_result = "";
         bool m_ready;
 
+        float m_resultShownAt = -1f;
+        bool m_returningToLobby;
+
         private GUIStyle m_boxStyle;
         private GUIStyle m_textStyle;
+        private GUIStyle m_winCardStyle;
+        private GUIStyle m_loseCardStyle;
+        private GUIStyle m_endTitleStyle;
+        private GUIStyle m_endSubStyle;
         private Texture2D m_shadowTex;
 
         void Start()
@@ -119,6 +128,15 @@ namespace Delivery3
         void Update()
         {
             UpdateCircles();
+
+            if (!string.IsNullOrEmpty(m_result) && m_resultShownAt < 0f)
+                m_resultShownAt = Time.time;
+
+            if (!m_returningToLobby && m_resultShownAt >= 0f && Time.time - m_resultShownAt >= ResultDisplaySeconds)
+            {
+                m_returningToLobby = true;
+                SceneManager.LoadScene(LobbySession.RoomScene);
+            }
         }
 
         public void ServerUpdate()
@@ -413,6 +431,8 @@ namespace Delivery3
             if (m_boxStyle != null) return;
 
             Color gold = new Color(1.00f, 0.82f, 0.20f, 1f);
+            Color winBorder = new Color(0.44f, 0.86f, 0.24f, 1f);
+            Color loseBorder = new Color(1.00f, 0.45f, 0.18f, 1f);
 
             m_shadowTex = new Texture2D(2, 2);
             Color sc = new Color(0.05f, 0.04f, 0.08f, 0.55f);
@@ -435,6 +455,40 @@ namespace Delivery3
                 richText = true,
                 wordWrap = true,
                 normal = { textColor = Color.white }
+            };
+
+            m_winCardStyle = new GUIStyle(GUI.skin.box)
+            {
+                normal = { background = MakeGradTex(64, 64,
+                    new Color(0.16f, 0.28f, 0.20f, 0.96f),
+                    new Color(0.11f, 0.17f, 0.14f, 0.98f), winBorder, 3) },
+                padding = new RectOffset(28, 28, 22, 22)
+            };
+
+            m_loseCardStyle = new GUIStyle(GUI.skin.box)
+            {
+                normal = { background = MakeGradTex(64, 64,
+                    new Color(0.28f, 0.16f, 0.16f, 0.96f),
+                    new Color(0.16f, 0.11f, 0.13f, 0.98f), loseBorder, 3) },
+                padding = new RectOffset(28, 28, 22, 22)
+            };
+
+            m_endTitleStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 32,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                richText = true,
+                normal = { textColor = gold }
+            };
+
+            m_endSubStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 15,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                richText = true,
+                normal = { textColor = new Color(0.95f, 0.96f, 0.92f) }
             };
         }
 
@@ -460,15 +514,47 @@ namespace Delivery3
                 "\n<color=#FFD166>Time:</color> " + (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00");
 
             float boxW = 260f;
-            float boxH = string.IsNullOrEmpty(m_result) ? 74f : 108f;
-
-            if (!string.IsNullOrEmpty(m_result))
-                text += "\n<color=#FF7B54>" + m_result + "</color>";
-
+            float boxH = 74f;
             Rect boxRect = new Rect(Screen.width - boxW - 16f, 14f, boxW, boxH);
+
             GUI.DrawTexture(new Rect(boxRect.x + 6f, boxRect.y + 8f, boxRect.width, boxRect.height), m_shadowTex);
             GUI.Box(boxRect, "", m_boxStyle);
             GUI.Label(boxRect, text, m_textStyle);
+
+            if (!string.IsNullOrEmpty(m_result))
+            {
+                string role = "Chased";
+                LobbyClient client = LobbySession.Instance.Client;
+                if (client != null && !string.IsNullOrEmpty(client.userName) &&
+                    client.Teams.TryGetValue(client.userName, out PlayerDTO2 dto) &&
+                    !string.IsNullOrEmpty(dto.playerRole))
+                {
+                    role = dto.playerRole;
+                }
+
+                bool hasWinner = m_result.Contains("Hunter") || m_result.Contains("Chased");
+                bool won = (m_result.Contains("Hunter") && role == "Hunter") ||
+                           (m_result.Contains("Chased") && role == "Chased");
+
+                string headline = hasWinner
+                    ? (won ? "<color=#70FF5C>YOU WIN</color>" : "<color=#FF6B35>YOU LOSE</color>")
+                    : "<color=#FFD166>MATCH ENDED</color>";
+
+                float leftSec = Mathf.Max(0f, ResultDisplaySeconds - (m_resultShownAt >= 0f ? Time.time - m_resultShownAt : 0f));
+
+                float endW = 460f;
+                float endH = 156f;
+                Rect endRect = new Rect((Screen.width - endW) * 0.5f, (Screen.height - endH) * 0.5f, endW, endH);
+
+                GUI.DrawTexture(new Rect(endRect.x + 8f, endRect.y + 10f, endRect.width, endRect.height), m_shadowTex);
+                GUILayout.BeginArea(endRect, won || !hasWinner ? m_winCardStyle : m_loseCardStyle);
+                GUILayout.Label(headline, m_endTitleStyle);
+                GUILayout.Space(4);
+                GUILayout.Label(m_result, m_endSubStyle);
+                GUILayout.Space(6);
+                GUILayout.Label("<color=#FFD166>Returning to lobby in " + Mathf.CeilToInt(leftSec) + "s...</color>", m_endSubStyle);
+                GUILayout.EndArea();
+            }
         }
 
         void OnDestroy()
