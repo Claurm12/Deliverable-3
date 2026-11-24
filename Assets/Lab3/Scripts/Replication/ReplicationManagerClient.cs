@@ -168,7 +168,7 @@ namespace Delivery3
             if (type == NetBullet.TypeId)
             {
                 NetBullet bullet =
-                    NetBullet.CreateVisual(Vector3.zero, 0f);
+                    NetBullet.CreateVisual(Vector3.zero, 0f, false);
 
                 bullet.id = id;
                 bullet.replicaLinking = m_linking;

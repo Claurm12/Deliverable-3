@@ -13,6 +13,16 @@ namespace Delivery3
         public static bool JumpRequested { get; set; }
         public static bool ShootRequested { get; set; }
         public static bool IsTypingInChat { get; private set; }
+        public static bool IsRotatingCamera { get; private set; }
+
+        static Vector2 s_cameraDrag;
+
+        public static Vector2 ConsumeCameraDrag()
+        {
+            Vector2 drag = s_cameraDrag;
+            s_cameraDrag = Vector2.zero;
+            return drag;
+        }
 
         private GUIStyle m_hunterCardStyle;
         private GUIStyle m_chasedCardStyle;
@@ -164,6 +174,13 @@ namespace Delivery3
             IsTypingInChat = (GUI.GetNameOfFocusedControl() == "chat");
 
             Event e = Event.current;
+            if (e != null && e.isMouse && e.button == 1)
+            {
+                if (e.type == EventType.MouseDown) IsRotatingCamera = true;
+                else if (e.type == EventType.MouseUp) IsRotatingCamera = false;
+                else if (e.type == EventType.MouseDrag && IsRotatingCamera) s_cameraDrag += e.delta;
+            }
+
             if (!IsTypingInChat && e != null)
             {
                 if (e.type == EventType.KeyDown || e.type == EventType.KeyUp)
@@ -226,6 +243,7 @@ namespace Delivery3
             float roleH = 96f;
             Rect roleRect = new Rect((Screen.width - roleW) * 0.5f, 14f, roleW, roleH);
 
+<<<<<<< Updated upstream
             GUI.DrawTexture(new Rect(roleRect.x + 6f, roleRect.y + 8f, roleRect.width, roleRect.height), m_shadowTex);
             GUILayout.BeginArea(roleRect, isHunter ? m_hunterCardStyle : m_chasedCardStyle);
 
@@ -284,6 +302,13 @@ namespace Delivery3
                 GUILayout.Label(client.Chat[i], m_chatLineStyle);
 
             GUILayout.FlexibleSpace();
+=======
+            LobbyGUI.Begin("<color=black>GAME  (" + session.protocol + ")   " + client.RoomInfo);
+            GUILayout.Label("<color=black>Role: " + role + "   |   " + statusText);
+            GUILayout.Label("<color=black>Move: forward: W / ↑ Left: A / ← Backward: S / ↓ Right: D / →  Jump: Space  Shoot: F  Camera: hold right mouse button");
+            GUILayout.Label("<color=black>Players: " + string.Join(", ", client.Players) +
+                            "<color=black>    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
+>>>>>>> Stashed changes
 
             GUILayout.BeginHorizontal();
             bool enter = Event.current.type == EventType.KeyDown &&

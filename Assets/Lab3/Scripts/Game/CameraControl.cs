@@ -4,26 +4,56 @@ namespace Delivery3
 {
     public class CameraControl : MonoBehaviour
     {
-        public Transform target;
-        public Vector3 offset = new Vector3(0f, 5f, -10f);
-        public float smoothSpeed = 10f;
+        public static CameraControl Instance { get; private set; }
 
-        void Start()
+        public Transform target;
+        public float distance = 10.5f;
+        public float pivotHeight = 1f;
+        public float mouseSensitivity = 0.25f;
+        public float minPitch = 5f;
+        public float maxPitch = 70f;
+        public float followSmoothing = 15f;
+
+        public float Yaw { get; private set; }
+
+        float m_pitch = 25f;
+        Vector3 m_pivot;
+        Transform m_lastTarget;
+
+        void Awake()
         {
-            transform.eulerAngles = new Vector3(25f, 0f, 0f);
+            Instance = this;
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
         }
 
         void LateUpdate()
         {
-            if (target != null)
+            if (target == null)
+                return;
+
+            Vector3 desiredPivot = target.position + Vector3.up * pivotHeight;
+
+            if (target != m_lastTarget)
             {
-                Vector3 targetPosition = target.position + offset;
-                transform.position = Vector3.Lerp(
-                    transform.position,
-                    targetPosition,
-                    smoothSpeed * Time.deltaTime
-                );
+                m_lastTarget = target;
+                Yaw = target.eulerAngles.y;
+                m_pivot = desiredPivot;
             }
+
+            Vector2 drag = GameUI.ConsumeCameraDrag();
+            Yaw += drag.x * mouseSensitivity;
+            m_pitch = Mathf.Clamp(m_pitch + drag.y * mouseSensitivity, minPitch, maxPitch);
+
+            m_pivot = Vector3.Lerp(m_pivot, desiredPivot, Mathf.Clamp01(followSmoothing * Time.deltaTime));
+
+            Quaternion orbit = Quaternion.Euler(m_pitch, Yaw, 0f);
+            transform.position = m_pivot - orbit * Vector3.forward * distance;
+            transform.rotation = orbit;
         }
     }
 }

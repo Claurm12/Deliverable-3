@@ -25,6 +25,8 @@ namespace Delivery3
             if (LobbyGUI.NeedsSession()) return;
             if (m_netPlayer != null && m_netPlayer.isDead) return;
 
+            transform.rotation = Quaternion.Euler(0f, FacingYaw(), 0f);
+
             LobbySession session = LobbySession.Instance;
             LobbyClient client = session.Client;
 
@@ -69,6 +71,12 @@ namespace Delivery3
                     GameManager.Instance.SpawnAndSendBullet(session, client, objectId, spawnPos, shootDir);
                 }
             }
+        }
+
+        float FacingYaw()
+        {
+            CameraControl cam = CameraControl.Instance;
+            return cam != null && cam.target == transform ? cam.Yaw : transform.eulerAngles.y;
         }
 
         void FixedUpdate()
@@ -125,18 +133,8 @@ namespace Delivery3
 
             if (moving)
             {
-                Vector3 moveDir = direction.normalized;
+                Vector3 moveDir = Quaternion.Euler(0f, FacingYaw(), 0f) * direction.normalized;
                 currentPos += moveDir * moveSpeed * Time.fixedDeltaTime;
-
-                Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-                if (m_rb != null)
-                {
-                    m_rb.MoveRotation(Quaternion.Slerp(m_rb.rotation, targetRotation, 15f * Time.fixedDeltaTime));
-                }
-                else
-                {
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 15f * Time.fixedDeltaTime);
-                }
             }
 
             if (m_rb != null)
