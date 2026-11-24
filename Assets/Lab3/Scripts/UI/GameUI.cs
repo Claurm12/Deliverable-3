@@ -243,7 +243,6 @@ namespace Delivery3
             float roleH = 96f;
             Rect roleRect = new Rect((Screen.width - roleW) * 0.5f, 14f, roleW, roleH);
 
-<<<<<<< Updated upstream
             GUI.DrawTexture(new Rect(roleRect.x + 6f, roleRect.y + 8f, roleRect.width, roleRect.height), m_shadowTex);
             GUILayout.BeginArea(roleRect, isHunter ? m_hunterCardStyle : m_chasedCardStyle);
 
@@ -255,7 +254,7 @@ namespace Delivery3
 
                 GUILayout.Label("<color=#FF6B35>ROLE: HUNTER</color>   |   " + statusText, m_roleTitleStyle);
                 GUILayout.Label("Eliminate the runners. Careful: shooting an NPC costs 1 life!", m_objectiveStyle);
-                GUILayout.Label("Move: W/A/S/D or Arrows  •  Jump: Space  •  <color=#FFD166>Shoot: F</color>", m_controlsStyle);
+                GUILayout.Label("Move: W/A/S/D or Arrows  •  Jump: Space  •  <color=#FFD166>Shoot: F</color>  •  Camera: hold right click", m_controlsStyle);
             }
             else
             {
@@ -265,7 +264,7 @@ namespace Delivery3
 
                 GUILayout.Label("<color=#58D646>ROLE: CHASED</color>   |   " + statusText, m_roleTitleStyle);
                 GUILayout.Label("Stand inside the red circles until they turn green to complete tasks!", m_objectiveStyle);
-                GUILayout.Label("Move: W/A/S/D or Arrows  •  Jump: Space", m_controlsStyle);
+                GUILayout.Label("Move: W/A/S/D or Arrows  •  Jump: Space  •  Camera: hold right click", m_controlsStyle);
             }
 
             GUILayout.EndArea();
@@ -302,13 +301,6 @@ namespace Delivery3
                 GUILayout.Label(client.Chat[i], m_chatLineStyle);
 
             GUILayout.FlexibleSpace();
-=======
-            LobbyGUI.Begin("<color=black>GAME  (" + session.protocol + ")   " + client.RoomInfo);
-            GUILayout.Label("<color=black>Role: " + role + "   |   " + statusText);
-            GUILayout.Label("<color=black>Move: forward: W / ↑ Left: A / ← Backward: S / ↓ Right: D / →  Jump: Space  Shoot: F  Camera: hold right mouse button");
-            GUILayout.Label("<color=black>Players: " + string.Join(", ", client.Players) +
-                            "<color=black>    ping " + (client.PingMs < 0 ? "-" : client.PingMs + " ms"));
->>>>>>> Stashed changes
 
             GUILayout.BeginHorizontal();
             bool enter = Event.current.type == EventType.KeyDown &&
