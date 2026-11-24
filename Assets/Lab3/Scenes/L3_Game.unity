@@ -15697,8 +15697,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Delivery3.CameraControl
   target: {fileID: 0}
-  offset: {x: 0, y: 5, z: -10}
-  smoothSpeed: 10
+  distance: 10.5
+  pivotHeight: 1
+  mouseSensitivity: 0.25
+  minPitch: 5
+  maxPitch: 70
+  followSmoothing: 15
+  minDistance: 4.5
+  zoomSmoothing: 6
+  castRadius: 0.3
+  skinOffset: 0.4
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1001 &1923784958
 PrefabInstance:
   m_ObjectHideFlags: 0
