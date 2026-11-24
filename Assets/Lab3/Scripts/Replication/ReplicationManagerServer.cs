@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +6,6 @@ using UnityEngine;
 
 namespace Delivery3
 {
-
     public class ReplicationManagerServer
     {
         readonly LinkingContext m_linking;
@@ -18,12 +16,9 @@ namespace Delivery3
 
         public Func<float> clock = () => Time.time;
 
-        public ReplicationManagerServer(LinkingContext linking) { m_linking = linking; }
-
-        public class TodoException : Exception
+        public ReplicationManagerServer(LinkingContext linking)
         {
-            public int number;
-            public TodoException(int number) : base("TODO " + number) { this.number = number; }
+            m_linking = linking;
         }
 
         public void MarkCreate(int id)
@@ -46,14 +41,15 @@ namespace Delivery3
 
         public byte[] WritePacket()
         {
+            float now = clock();
+
             foreach (int id in m_repeat.Keys.ToList())
             {
-                if (clock() > m_repeat[id].until) m_repeat.Remove(id);
-                else m_pending[id] = m_repeat[id].action;
+                if (now > m_repeat[id].until)
+                    m_repeat.Remove(id);
+                else
+                    m_pending[id] = m_repeat[id].action;
             }
-
-            MemoryStream stream = new MemoryStream();
-            BinaryWriter writer = new BinaryWriter(stream);
 
             List<KeyValuePair<int, ReplicationAction>> entries = new List<KeyValuePair<int, ReplicationAction>>();
             foreach (KeyValuePair<int, ReplicationAction> entry in m_pending)
@@ -61,27 +57,40 @@ namespace Delivery3
                 if (entry.Value != ReplicationAction.Destroy)
                 {
                     GameObject go = m_linking.Find(entry.Key);
-                    if (go == null || go.GetComponent<NetObject>() == null) continue;
+                    if (go == null || go.GetComponent<NetObject>() == null)
+                        continue;
                 }
                 entries.Add(entry);
             }
 
-            writer.Write((byte)MsgType.Replication);
-            writer.Write(m_sequence++);
-            writer.Write(entries.Count);
-
-            foreach (KeyValuePair<int, ReplicationAction> entry in entries)
+            using (MemoryStream stream = new MemoryStream())
+            using (BinaryWriter writer = new BinaryWriter(stream))
             {
-                writer.Write(entry.Key);
-                writer.Write((byte)entry.Value);
-                if (entry.Value == ReplicationAction.Destroy) continue;
-                NetObject obj = m_linking.Find(entry.Key).GetComponent<NetObject>();
-                writer.Write(obj.type);
-                obj.Write(writer);
-            }
+                writer.Write((byte)MsgType.Replication);
+                writer.Write(m_sequence++);
+                writer.Write(entries.Count);
 
-            m_pending.Clear();
-            return stream.ToArray();
+                foreach (KeyValuePair<int, ReplicationAction> entry in entries)
+                {
+                    writer.Write(entry.Key);
+                    writer.Write((byte)entry.Value);
+
+                    if (entry.Value == ReplicationAction.Destroy)
+                        continue;
+
+                    NetObject obj = m_linking.Find(entry.Key).GetComponent<NetObject>();
+                    writer.Write(obj.type);
+                    obj.Write(writer);
+                }
+
+                m_pending.Clear();
+                byte[] packet = stream.ToArray();
+
+                if (packet.Length > 1200)
+                    Debug.LogWarning("[REPL SERVER] Packet size (" + packet.Length + " bytes) exceeds 1200 bytes.");
+
+                return packet;
+            }
         }
     }
 }

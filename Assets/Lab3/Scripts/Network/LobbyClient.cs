@@ -19,10 +19,8 @@ namespace Delivery3
         }
 
         public readonly List<string> Players = new List<string>();
-
         public readonly Dictionary<string, PlayerDTO2> Teams =
             new Dictionary<string, PlayerDTO2>();
-
         public readonly List<string> Chat = new List<string>();
 
         public string RoomInfo = "";
@@ -46,7 +44,7 @@ namespace Delivery3
         protected ReplicationManagerClient m_replicationClient;
         protected LinkingContext m_linkingContext;
 
-        [Header("Prefabs de Red (0: Jugador, 1: Bala, etc.)")]
+        [Header("Prefabs de Red (0: Hunter, 1..N: Chased)")]
         public GameObject[] networkPrefabs;
 
         public event Action<int, Vector3, float> TransformReceived;
@@ -69,7 +67,6 @@ namespace Delivery3
         public void SendChat(string line)
         {
             line = line.Trim();
-
             if (line.Length > 0)
                 SendText("CHAT:" + line);
         }
@@ -97,30 +94,21 @@ namespace Delivery3
             if (m_linkingContext == null)
             {
                 m_linkingContext = gameObject.GetComponent<LinkingContext>();
-
                 if (m_linkingContext == null)
                     m_linkingContext = gameObject.AddComponent<LinkingContext>();
             }
 
             if (m_replicationClient == null)
             {
-                m_replicationClient =
-                    gameObject.GetComponent<ReplicationManagerClient>();
-
+                m_replicationClient = gameObject.GetComponent<ReplicationManagerClient>();
                 if (m_replicationClient == null)
-                {
-                    m_replicationClient =
-                        gameObject.AddComponent<ReplicationManagerClient>();
-                }
+                    m_replicationClient = gameObject.AddComponent<ReplicationManagerClient>();
             }
 
             GameObject[] prefabsToUse = GetEffectivePrefabs();
-
             m_replicationClient.Init(
                 m_linkingContext,
-                prefabsToUse != null
-                    ? new List<GameObject>(prefabsToUse)
-                    : null);
+                prefabsToUse != null ? new List<GameObject>(prefabsToUse) : null);
         }
 
         GameObject[] GetEffectivePrefabs()
@@ -152,12 +140,8 @@ namespace Delivery3
 
                 m_lastHeard = Time.realtimeSinceStartup;
 
-                if (data.Length > 0 &&
-                    (MsgType)data[0] == MsgType.Replication)
+                if (data.Length > 0 && (MsgType)data[0] == MsgType.Replication)
                 {
-                    if (LobbySession.Instance.IsHost)
-                        continue;
-
                     if (m_replicationClient != null)
                     {
                         using (BinaryReader reader = new BinaryReader(
@@ -191,9 +175,7 @@ namespace Delivery3
                 }
                 catch (Exception e)
                 {
-                    Log(
-                        "[CLIENT " + userName +
-                        "] Paquete corrupto descartado: " + e.Message);
+                    Log("[CLIENT " + userName + "] Paquete corrupto descartado: " + e.Message);
                     continue;
                 }
 
@@ -246,7 +228,6 @@ namespace Delivery3
             {
                 case "PLAYERS":
                     Players.Clear();
-
                     if (content.Length > 0)
                         Players.AddRange(content.Split(','));
 
@@ -256,16 +237,13 @@ namespace Delivery3
                             Teams.Remove(name);
                     }
 
-                    Log(
-                        "[CLIENT " + userName + "] Jugadores (" +
-                        Players.Count + "): " + string.Join(", ", Players));
+                    Log("[CLIENT " + userName + "] Jugadores (" + Players.Count + "): " + string.Join(", ", Players));
 
                     if (!InRoom)
                     {
                         InRoom = true;
                         if (Joined != null) Joined();
                     }
-
                     break;
 
                 case "ROOM":
@@ -274,27 +252,21 @@ namespace Delivery3
 
                 case "CHAT":
                     Chat.Add(content);
-
                     if (Chat.Count > 50)
                         Chat.RemoveAt(0);
-
                     Log("[CLIENT " + userName + "] Chat: " + content);
                     break;
 
                 case "PONG":
                     int sent;
-
                     if (int.TryParse(content, out sent))
                         PingMs = Environment.TickCount - sent;
-
                     break;
 
                 case "START":
                     Log("[CLIENT " + userName + "] El host ha iniciado el juego");
-
                     if (GameStarted != null)
                         GameStarted();
-
                     break;
 
                 case "KICKED":

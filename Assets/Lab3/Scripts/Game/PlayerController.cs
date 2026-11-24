@@ -32,14 +32,14 @@ namespace Delivery3
             if (m_sendTimer >= 0.05f)
             {
                 m_sendTimer = 0f;
-                byte[] packet = Messages.Transform(objectId, transform.position, transform.eulerAngles.y);
 
                 if (session.IsHost)
                 {
-                    session.Server.BroadcastCustomBytes(packet);
+                    session.Server.UpdateTransformFromHost(objectId, transform.position, transform.eulerAngles.y);
                 }
                 else
                 {
+                    byte[] packet = Messages.Transform(objectId, transform.position, transform.eulerAngles.y);
                     client.SendCustomBytes(packet);
                 }
             }
@@ -56,11 +56,7 @@ namespace Delivery3
                     currentRole = data.playerRole;
                 }
 
-                if (currentRole == "Hunter" && Time.time < m_nextShotTime)
-                {
-                    // bala en cooldown
-                }
-                else if (currentRole == "Hunter")
+                if (currentRole == "Hunter" && Time.time >= m_nextShotTime)
                 {
                     m_nextShotTime = Time.time + NetBullet.Cooldown;
 
@@ -71,10 +67,6 @@ namespace Delivery3
                     Vector3 shootDir = transform.forward;
 
                     GameManager.Instance.SpawnAndSendBullet(session, client, objectId, spawnPos, shootDir);
-                }
-                else
-                {
-                    Debug.Log("No puedes disparar porque eres el que escapa.");
                 }
             }
         }
@@ -113,7 +105,6 @@ namespace Delivery3
 
             Vector3 currentPos = (m_rb != null) ? m_rb.position : transform.position;
 
-            // Gestión del salto
             if (GameUI.JumpRequested && currentPos.y <= 0.51f)
             {
                 m_verticalVelocity = m_jumpForce;
@@ -137,7 +128,6 @@ namespace Delivery3
                 Vector3 moveDir = direction.normalized;
                 currentPos += moveDir * moveSpeed * Time.fixedDeltaTime;
 
-                // Girar suavemente hacia la dirección en la que nos movemos
                 Quaternion targetRotation = Quaternion.LookRotation(moveDir);
                 if (m_rb != null)
                 {
@@ -149,7 +139,6 @@ namespace Delivery3
                 }
             }
 
-            // Aplicar movimiento físico y frenar rebotes residuales
             if (m_rb != null)
             {
                 m_rb.linearVelocity = Vector3.zero;
