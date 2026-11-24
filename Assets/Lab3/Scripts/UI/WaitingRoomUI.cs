@@ -188,7 +188,7 @@ namespace Delivery3
 
             GUILayout.Space(16);
 
-            // Más margen vertical para que los botones inferiores no queden pegados al borde
+            // Extra vertical margin so bottom buttons stay clear of the card border
             float innerHeight = cardHeight - 200f;
             GUILayout.BeginHorizontal(GUILayout.Height(innerHeight));
             DrawPlayers(session, client, innerHeight);

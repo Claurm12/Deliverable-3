@@ -52,8 +52,14 @@ namespace Delivery3
             return type;
         }
 
-
-        public static MsgType Read(byte[] data, out string text, out PlayerDTO2 player, out int objectId, out Vector3 pos, out float rotY, out Vector3 dir)
+        public static MsgType Read(
+            byte[] data,
+            out string text,
+            out PlayerDTO2 player,
+            out int objectId,
+            out Vector3 pos,
+            out float rotY,
+            out Vector3 dir)
         {
             text = null;
             player = new PlayerDTO2();
@@ -79,10 +85,10 @@ namespace Delivery3
                     break;
 
                 case MsgType.Transform:
-                    byte[] bodyTransform = new byte[data.Length - 5]; // 4 bytes menos que pertenecen a rotY
+                    byte[] bodyTransform = new byte[data.Length - 5];
                     Array.Copy(data, 1, bodyTransform, 0, bodyTransform.Length);
                     Serializer.DeserializeTransform(bodyTransform, out objectId, out pos);
-                    rotY = BitConverter.ToSingle(data, data.Length - 4); // Leemos el float rotY del final
+                    rotY = BitConverter.ToSingle(data, data.Length - 4);
                     break;
 
                 case MsgType.Shoot:
@@ -97,7 +103,6 @@ namespace Delivery3
             return type;
         }
 
-        // Sustituye tu método Transform(...) por este (añade 'float rotY'):
         public static byte[] Transform(int objectId, Vector3 pos, float rotY)
         {
             byte[] body = Serializer.SerializeTransform(objectId, pos);
@@ -108,7 +113,6 @@ namespace Delivery3
             rotBytes.CopyTo(message, 1 + body.Length);
             return message;
         }
-
 
         public static byte[] Transform(int objectId, Vector3 pos)
         {
@@ -129,4 +133,3 @@ namespace Delivery3
         }
     }
 }
-

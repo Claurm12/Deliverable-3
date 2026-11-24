@@ -44,7 +44,7 @@ namespace Delivery3
         protected ReplicationManagerClient m_replicationClient;
         protected LinkingContext m_linkingContext;
 
-        [Header("Prefabs de Red (0: Hunter, 1..N: Chased)")]
+        [Header("Network Prefabs (0: Hunter, 1..N: Chased)")]
         public GameObject[] networkPrefabs;
 
         public event Action<int, Vector3, float> TransformReceived;
@@ -175,7 +175,7 @@ namespace Delivery3
                 }
                 catch (Exception e)
                 {
-                    Log("[CLIENT " + userName + "] Paquete corrupto descartado: " + e.Message);
+                    Log("[CLIENT " + userName + "] Corrupted packet discarded: " + e.Message);
                     continue;
                 }
 
@@ -215,7 +215,7 @@ namespace Delivery3
             Teams[dto.playerName] = dto;
 
             if (changed)
-                Log("[CLIENT " + userName + "] Datos de " + dto.playerName);
+                Log("[CLIENT " + userName + "] Data for " + dto.playerName);
         }
 
         void OnText(string text)
@@ -237,7 +237,7 @@ namespace Delivery3
                             Teams.Remove(name);
                     }
 
-                    Log("[CLIENT " + userName + "] Jugadores (" + Players.Count + "): " + string.Join(", ", Players));
+                    Log("[CLIENT " + userName + "] Players (" + Players.Count + "): " + string.Join(", ", Players));
 
                     if (!InRoom)
                     {
@@ -264,13 +264,13 @@ namespace Delivery3
                     break;
 
                 case "START":
-                    Log("[CLIENT " + userName + "] El host ha iniciado el juego");
+                    Log("[CLIENT " + userName + "] The host has started the game");
                     if (GameStarted != null)
                         GameStarted();
                     break;
 
                 case "KICKED":
-                    Close("El host te ha expulsado de la sala");
+                    Close("The host kicked you from the room");
                     break;
 
                 case "ERROR":
@@ -287,7 +287,7 @@ namespace Delivery3
             InRoom = false;
             CloseSocket();
 
-            Log("[CLIENT " + userName + "] Cerrado: " + reason);
+            Log("[CLIENT " + userName + "] Closed: " + reason);
 
             if (Closed != null)
                 Closed(reason);

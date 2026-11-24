@@ -6,7 +6,7 @@ namespace Delivery3
     public class NetObject : MonoBehaviour
     {
         public int id;
-        public byte type;       // indice del prefab
+        public byte type;       //prefab index
 
         public virtual void Write(BinaryWriter writer)
         {

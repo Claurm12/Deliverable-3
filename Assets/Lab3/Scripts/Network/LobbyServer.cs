@@ -13,7 +13,7 @@ namespace Delivery3
         public int port = 9050;
         public int maxPlayers = 4;
 
-        [Header("0 = Hunter | 1..N = Prefabs de Chased")]
+        [Header("0 = Hunter | 1..N = Chased Prefabs")]
         public GameObject[] networkPrefabs;
 
         public string LocalHostIP { get; private set; } = "127.0.0.1";
@@ -108,7 +108,7 @@ namespace Delivery3
         public virtual bool StartServer()
         {
             LocalHostIP = GetLocalHostIP();
-            Log("[SERVER] IP Local: " + LocalHostIP + ":" + port);
+            Log("[SERVER] Local IP: " + LocalHostIP + ":" + port);
 
             m_linkingContext = gameObject.GetComponent<LinkingContext>();
             if (m_linkingContext == null)
@@ -165,7 +165,7 @@ namespace Delivery3
                 }
                 catch (Exception ex)
                 {
-                    Log("[SERVER] Mensaje erróneo descartado de " + Describe(e.from) + ": " + ex.Message);
+                    Log("[SERVER] Invalid message discarded from " + Describe(e.from) + ": " + ex.Message);
                     continue;
                 }
 
@@ -874,7 +874,7 @@ namespace Delivery3
 
                 SendText(
                     p.connection,
-                    isHunter ? "CHAT:Eres el CAZADOR" : "CHAT:Escapa del cazador");
+                    isHunter ? "CHAT:You are the HUNTER" : "CHAT:Escape the hunter");
             }
 
             SendRoomState();

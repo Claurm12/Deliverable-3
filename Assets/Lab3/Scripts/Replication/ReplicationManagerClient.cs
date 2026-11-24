@@ -6,7 +6,7 @@ namespace Delivery3
 {
     public class ReplicationManagerClient : MonoBehaviour
     {
-        [Header("0 = Hunter | 1..N = Prefabs de Chased (mismo orden que LobbyServer)")]
+        [Header("0 = Hunter | 1..N = Chased Prefabs (same order as LobbyServer)")]
         [SerializeField] List<GameObject> m_prefabs = new List<GameObject>();
 
         LinkingContext m_linking;
@@ -178,7 +178,7 @@ namespace Delivery3
 
             if (m_prefabs == null || m_prefabs.Count == 0)
             {
-                Debug.LogError("[REPL CLIENT] No hay prefabs configurados.");
+                Debug.LogError("[REPL CLIENT] No prefabs configured.");
                 return null;
             }
 

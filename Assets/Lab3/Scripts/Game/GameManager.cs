@@ -46,8 +46,8 @@ namespace Delivery3
 
             GameObject myPlayerObject = linking != null ? linking.Find(m_myObjectId) : null;
 
-            string rolActual = GetRoleFromClient(session.Client, myName);
-            int prefabIndex = rolActual == "Hunter" ? 0 : 1;
+            string currentRole = GetRoleFromClient(session.Client, myName);
+            int prefabIndex = currentRole == "Hunter" ? 0 : 1;
 
             GameObject[] currentPrefabs = GetPrefabs(session);
 
