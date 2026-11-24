@@ -827,17 +827,18 @@ namespace Delivery3
 
         public void StartGame()
         {
-            if (Started)
-                return;
+           /* if (Started)
+                return;*/
 
             if (m_players.Count < 2)
             {
                 Broadcast("CHAT:* We need at least two players to start!");
                 return;
             }
+            ResetMatchState();
 
-            MatchEnded = false;
-            MatchResult = "";
+            //MatchEnded = false;
+            //MatchResult = "";
 
             int hunterIndex = UnityEngine.Random.Range(0, m_players.Count);
 
@@ -902,6 +903,19 @@ namespace Delivery3
         void BroadcastSystem(string text)
         {
             Broadcast("CHAT:* " + text);
+        }
+
+        void ResetMatchState()
+        {
+            foreach (ServerBullet b in m_bullets)
+                DestroyBullet(b.id);
+
+            m_bullets.Clear();
+            m_npcCrowd = null;
+            m_taskMatch = null;
+            MatchResult = "";
+            MatchEnded = false;
+            Started = false;
         }
 
         protected void Broadcast(string text)
