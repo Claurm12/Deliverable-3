@@ -34,6 +34,10 @@ namespace Delivery3
         string m_result = "";
         bool m_ready;
 
+        private GUIStyle m_boxStyle;
+        private GUIStyle m_textStyle;
+        private Texture2D m_shadowTex;
+
         void Start()
         {
             if (LobbyGUI.NeedsSession())
@@ -385,10 +389,61 @@ namespace Delivery3
             return line;
         }
 
+        private Texture2D MakeGradTex(int w, int h, Color top, Color bottom, Color border, int borderSize)
+        {
+            Texture2D tex = new Texture2D(w, h);
+            Color[] pixels = new Color[w * h];
+            for (int y = 0; y < h; y++)
+            {
+                float t = (float)y / (h - 1);
+                Color rowColor = Color.Lerp(bottom, top, t);
+                for (int x = 0; x < w; x++)
+                {
+                    bool isBorder = x < borderSize || x >= w - borderSize || y < borderSize || y >= h - borderSize;
+                    pixels[y * w + x] = isBorder ? border : rowColor;
+                }
+            }
+            tex.SetPixels(pixels);
+            tex.Apply();
+            return tex;
+        }
+
+        private void InitStyles()
+        {
+            if (m_boxStyle != null) return;
+
+            Color gold = new Color(1.00f, 0.82f, 0.20f, 1f);
+
+            m_shadowTex = new Texture2D(2, 2);
+            Color sc = new Color(0.05f, 0.04f, 0.08f, 0.55f);
+            m_shadowTex.SetPixels(new[] { sc, sc, sc, sc });
+            m_shadowTex.Apply();
+
+            m_boxStyle = new GUIStyle(GUI.skin.box)
+            {
+                normal = { background = MakeGradTex(64, 64,
+                    new Color(0.22f, 0.23f, 0.28f, 0.94f),
+                    new Color(0.14f, 0.15f, 0.19f, 0.96f), gold, 3) },
+                padding = new RectOffset(14, 14, 10, 10)
+            };
+
+            m_textStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 16,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                richText = true,
+                wordWrap = true,
+                normal = { textColor = Color.white }
+            };
+        }
+
         void OnGUI()
         {
             if (!m_ready)
                 return;
+
+            InitStyles();
 
             int completed = 0;
 
@@ -401,14 +456,19 @@ namespace Delivery3
             int seconds = Mathf.CeilToInt(Mathf.Max(0f, m_remaining));
 
             string text =
-                "Tasks: " + completed + "/" + m_tasks.Count +
-                "\nTime: " + (seconds / 60).ToString("00") +
-                ":" + (seconds % 60).ToString("00");
+                "<color=#FFD166>Tasks:</color> <color=#70FF5C>" + completed + "/" + m_tasks.Count + "</color>" +
+                "\n<color=#FFD166>Time:</color> " + (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00");
+
+            float boxW = 260f;
+            float boxH = string.IsNullOrEmpty(m_result) ? 74f : 108f;
 
             if (!string.IsNullOrEmpty(m_result))
-                text += "\n" + m_result;
+                text += "\n<color=#FF7B54>" + m_result + "</color>";
 
-            GUI.Box(new Rect(Screen.width - 290, 15, 270, 80), text);
+            Rect boxRect = new Rect(Screen.width - boxW - 16f, 14f, boxW, boxH);
+            GUI.DrawTexture(new Rect(boxRect.x + 6f, boxRect.y + 8f, boxRect.width, boxRect.height), m_shadowTex);
+            GUI.Box(boxRect, "", m_boxStyle);
+            GUI.Label(boxRect, text, m_textStyle);
         }
 
         void OnDestroy()
