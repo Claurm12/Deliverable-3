@@ -284,7 +284,7 @@ namespace Delivery3
                 return;
             }
 
-            if (Started)
+            if (Started && !MatchEnded)
             {
                 Refuse(from, "The game has already started");
                 return;

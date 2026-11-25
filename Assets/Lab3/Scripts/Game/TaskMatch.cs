@@ -532,9 +532,12 @@ namespace Delivery3
                     role = dto.playerRole;
                 }
 
-                bool hasWinner = m_result.Contains("Hunter") || m_result.Contains("Chased");
-                bool won = (m_result.Contains("Hunter") && role == "Hunter") ||
-                           (m_result.Contains("Chased") && role == "Chased");
+                bool hunterWins = m_result.Contains("Hunter wins");
+                bool chasedWins = m_result.Contains("Chased win");
+                bool hasWinner = hunterWins || chasedWins;
+
+                bool won = (hunterWins && role == "Hunter") ||
+                           (chasedWins && role == "Chased");
 
                 string headline = hasWinner
                     ? (won ? "<color=#70FF5C>YOU WIN</color>" : "<color=#FF6B35>YOU LOSE</color>")
@@ -546,8 +549,12 @@ namespace Delivery3
                 float endH = 156f;
                 Rect endRect = new Rect((Screen.width - endW) * 0.5f, (Screen.height - endH) * 0.5f, endW, endH);
 
+                GUIStyle cardStyle = !hasWinner
+                    ? m_boxStyle
+                    : (won ? m_winCardStyle : m_loseCardStyle);
+
                 GUI.DrawTexture(new Rect(endRect.x + 8f, endRect.y + 10f, endRect.width, endRect.height), m_shadowTex);
-                GUILayout.BeginArea(endRect, won || !hasWinner ? m_winCardStyle : m_loseCardStyle);
+                GUILayout.BeginArea(endRect, cardStyle);
                 GUILayout.Label(headline, m_endTitleStyle);
                 GUILayout.Space(4);
                 GUILayout.Label(m_result, m_endSubStyle);
